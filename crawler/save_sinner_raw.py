@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 sinner_data = {
     "LastName": "Sinner",
@@ -35,13 +36,23 @@ sinner_data = {
     "SglHiRankDate": "2024-06-10T00:00:00"
 }
 
+raw_data = {
+    "source": "ATP",
+    "source_type": "player_overview",
+    "player_id": "s0ag",
+    "source_url": "https://www.atptour.com/en/-/www/players/hero/s0ag?v=1",
+    "saved_at": datetime.now().astimezone().isoformat(),
+    "collection_method": "manual_devtools_poc",
+    "data": sinner_data
+}
+
 with open(
     "data/raw/sinner_overview.json",
     "w",
     encoding="utf-8"
 ) as file:
     json.dump(
-        sinner_data,
+        raw_data,
         file,
         ensure_ascii=False,
         indent=4

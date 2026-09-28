@@ -35,17 +35,6 @@ with sync_playwright() as p:
 
     print("\n--- ATP Ranking Top 50 ---")
 
-
-    # 1위 선수의 상세 페이지 주소 확인
-    first_player = player_rows.nth(0)
-
-    player_link = first_player.locator(
-        "td.player li.name a"
-    ).get_attribute("href")
-
-    print("\n--- 1위 선수 상세 페이지 ---")
-    print(player_link)
-    
     
     # 앞에서부터 50개의 행만 반복
     for i in range(50):
@@ -56,12 +45,19 @@ with sync_playwright() as p:
         name = row.locator("td.player li.name span").inner_text()
         points = row.locator("td.points").inner_text()
 
+        # 선수 상세 페이지 주소 가져오기
+        player_link = row.locator(
+            "td.player li.name a"
+        ).get_attribute("href")
+
         print(
             rank.strip(),
             "|",
             name.strip(),
             "|",
-            points.strip()
+            points.strip(),
+            "|",
+            player_link
         )
 
     input("\n결과를 확인한 후 Enter를 누르세요...")

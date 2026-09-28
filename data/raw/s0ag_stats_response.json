@@ -1,0 +1,34 @@
+{
+    "FirstStatYear": 2019,
+    "LastStatYear": 2026,
+    "Stats": {
+        "PlayerId": "S0AG",
+        "RankDate": "2026-09-21T00:00:00",
+        "Category": "Career",
+        "Surface": "ALL",
+        "EventYear": 0,
+        "ServiceRecordStats": {
+            "Aces": 2763,
+            "DoubleFaults": 857,
+            "FirstServePercentage": 61,
+            "FirstServePointsWonPercentage": 76,
+            "SecondServePointsWonPercentage": 56,
+            "BreakPointsFaced": 2226,
+            "BreakPointsSavedPercentage": 68,
+            "ServiceGamesPlayed": 5491,
+            "ServiceGamesWonPercentage": 87,
+            "ServicePointsWonPercentage": 68
+        },
+        "ReturnRecordStats": {
+            "FirstServeReturnPointsWonPercentage": 32,
+            "SecondServeReturnPointsWonPercentage": 54,
+            "BreakPointsOpportunities": 3597,
+            "BreakPointsConvertedPercentage": 43,
+            "ReturnGamesPlayed": 5409,
+            "ReturnGamesWonPercentage": 28,
+            "ReturnPointsWonPercentage": 41,
+            "TotalPointsWonPercentage": 54
+        }
+    },
+    "CacheTags": null
+}
