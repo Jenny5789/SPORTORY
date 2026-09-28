@@ -6,6 +6,11 @@ __pycache__/
 .env
 .env.*
 
+# Collected / processed data
+data/raw/
+data/processed/
+data/player_images/
+
 # VS Code
 .vscode/
 
