@@ -1,0 +1,136 @@
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px clamp(20px, 5vw, 64px);
+  background: #0b0b0a;
+  color: #f4f2ea;
+}
+
+.site-wordmark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.06em;
+  color: #f4f2ea;
+  text-decoration: none;
+}
+
+.site-wordmark span {
+  color: #d8fb4c;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.site-nav a {
+  color: #f4f2ea;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.site-nav a:hover {
+  color: #d8fb4c;
+}
+
+/* SPORTS DROPDOWN */
+.site-nav-sports {
+  position: relative;
+}
+
+.site-nav-sports-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f4f2ea;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.site-nav-sports:hover .site-nav-sports-trigger,
+.site-nav-sports:focus-within .site-nav-sports-trigger {
+  color: #d8fb4c;
+}
+
+.site-nav-arrow {
+  color: #d8fb4c;
+  font-size: 11px;
+  transition: transform 0.2s ease;
+}
+
+.site-nav-sports:hover .site-nav-arrow,
+.site-nav-sports:focus-within .site-nav-arrow {
+  transform: rotate(180deg);
+}
+
+.site-nav-dropdown {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  z-index: 20;
+  min-width: 150px;
+  padding: 8px;
+  border: 1px solid rgba(244, 242, 234, 0.14);
+  background: #11110f;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0.2s ease;
+}
+
+.site-nav-dropdown::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  width: 100%;
+  height: 14px;
+}
+
+.site-nav-dropdown a {
+  display: block;
+  padding: 12px 14px;
+  color: #f4f2ea;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.site-nav-dropdown a:hover {
+  color: #d8fb4c;
+}
+
+.site-nav-sports:hover .site-nav-dropdown,
+.site-nav-sports:focus-within .site-nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    padding: 20px;
+  }
+
+  .site-nav {
+    gap: 16px;
+    font-size: 12px;
+  }
+
+  .site-nav-dropdown {
+    min-width: 130px;
+  }
+}

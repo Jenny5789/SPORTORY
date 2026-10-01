@@ -1,0 +1,319 @@
+/* =========================================================
+   RANKING
+   ========================================================= */
+.player-ranking {
+  padding: clamp(72px, 9vw, 120px) 0;
+  border-top: 1px solid var(--hair);
+}
+
+.player-ranking-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 56px;
+}
+
+.player-ranking-heading p {
+  margin: 0;
+  color: var(--lime);
+  font-size: 20px;
+  letter-spacing: 0.12em;
+}
+
+.player-ranking-heading h2 {
+  margin: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* CURRENT RANKING */
+.player-ranking-current {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+}
+
+.ranking-current-item {
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+  padding: 32px 0 40px;
+}
+
+.ranking-current-item + .ranking-current-item {
+  padding-left: clamp(28px, 5vw, 72px);
+  border-left: 1px solid var(--hair);
+}
+
+.ranking-label {
+  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+}
+
+.ranking-number {
+  margin-top: 14px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(89px, 10vw, 150px);
+  font-weight: 400;
+  line-height: 0.8;
+}
+
+.ranking-points {
+  margin-top: 22px;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+}
+
+.ranking-date {
+  position: absolute;
+  right: 0;
+  bottom: 18px;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+/* =========================================================
+   RANKING HISTORY
+   ========================================================= */
+.ranking-history {
+  padding-top: clamp(72px, 9vw, 112px);
+}
+
+.ranking-history-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.ranking-history-heading p {
+  margin: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.ranking-history-heading span {
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+/* HISTORY ROW */
+.ranking-history-block {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 0.22fr)
+    minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(36px, 6vw, 84px);
+  padding: 52px 0;
+  border-bottom: 1px solid var(--hair);
+}
+
+.ranking-history-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
+
+.ranking-history-label span {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
+.ranking-history-label strong {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 6vw, 88px);
+  font-weight: 400;
+  line-height: 0.9;
+}
+
+/* HISTORY CHART */
+.ranking-chart {
+  min-width: 0;
+}
+
+.ranking-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.ranking-chart-guide {
+  stroke: var(--hair);
+  stroke-width: 1;
+  stroke-dasharray: 5 8;
+}
+
+.ranking-chart-line {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ranking-chart-point {
+  fill: var(--lime);
+  stroke: var(--bg);
+  stroke-width: 3;
+}
+
+.ranking-chart-value {
+  fill: var(--text);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ranking-chart-dates {
+  display: grid;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.ranking-chart-dates span {
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+/* RANKING MOBILE */
+  /* CURRENT RANKING */
+  .player-ranking {
+    padding: 64px 0;
+  }
+
+  .player-ranking-heading {
+    display: block;
+    margin-bottom: 36px;
+  }
+
+  .player-ranking-heading h2 {
+    margin-top: 8px;
+  }
+
+  .player-ranking-current {
+    grid-template-columns: 1fr;
+    padding-bottom: 42px;
+  }
+
+  .ranking-current-item {
+    min-height: 0;
+    padding: 28px 0 32px;
+  }
+
+  .ranking-current-item + .ranking-current-item {
+    padding-left: 0;
+    border-top: 1px solid var(--hair);
+    border-left: 0;
+  }
+
+  .ranking-number {
+    font-size: clamp(88px, 30vw, 132px);
+  }
+
+  .ranking-date {
+    right: auto;
+    bottom: 16px;
+    left: 0;
+  }
+
+  /* RANKING HISTORY */
+  .ranking-history {
+    padding-top: 64px;
+  }
+
+  .ranking-history-heading {
+    display: block;
+  }
+
+  .ranking-history-heading span {
+    display: block;
+    margin-top: 8px;
+  }
+
+  .ranking-history-block {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 40px 0;
+  }
+
+  .ranking-history-label {
+    gap: 10px;
+  }
+
+  .ranking-history-label strong {
+    font-size: 64px;
+  }
+
+  .ranking-chart {
+    overflow-x: auto;
+    padding-top: 8px;
+  }
+
+  .ranking-chart svg {
+    min-width: 620px;
+  }
+
+  .ranking-chart-dates {
+    min-width: 620px;
+  }
+}
+/* EXPLORE PLAYER */
+.player-profile-explore {
+  margin-top: -70px;
+  margin-bottom: 48px;
+}
+
+.player-profile-explore > p {
+  margin: 0 0 20px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.player-profile-explore-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 40px;
+}
+
+.player-profile-explore-links a {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.player-profile-explore-links a span {
+  color: var(--lime);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.player-profile-explore-links a:hover {
+  color: var(--lime);
+}

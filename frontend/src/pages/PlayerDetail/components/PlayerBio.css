@@ -1,0 +1,184 @@
+.player-bio {
+  padding:
+    clamp(100px, 12vw, 180px)
+    clamp(20px, 5vw, 64px)
+    clamp(120px, 14vw, 200px);
+  background: #0b0b0a;
+  color: #f4f2ea;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.player-bio-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 60px;
+  padding-bottom: 42px;
+  border-bottom: 1px solid rgba(244, 242, 234, 0.14);
+}
+
+.player-bio-kicker {
+  margin: 0 0 22px;
+  color: #d8fb4c;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+.player-bio-header h2 {
+  margin: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 9vw, 138px);
+  font-weight: 400;
+  line-height: 0.78;
+}
+
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
+.player-bio-controls {
+  display: flex;
+  align-items: center;
+  gap: 38px;
+  padding-bottom: 6px;
+}
+
+.player-bio-tabs {
+  display: flex;
+  gap: 18px;
+}
+
+.player-bio-tabs button {
+  padding: 0 0 8px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: #77766f;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.player-bio-tabs button:hover {
+  color: #f4f2ea;
+}
+
+.player-bio-tabs button.is-active {
+  border-bottom-color: #d8fb4c;
+  color: #d8fb4c;
+}
+
+
+/* =========================================================
+   BIOGRAPHY ARTICLE
+   ========================================================= */
+
+.player-bio-reading {
+  width: min(900px, 100%);
+  margin: clamp(70px, 9vw, 130px) auto 0;
+}
+
+.player-bio-article {
+  width: 100%;
+}
+
+.player-bio-article p {
+  margin: 0 0 2em;
+  color: #e3e0d7;
+  font-size: clamp(17px, 1.45vw, 21px);
+  font-weight: 400;
+  line-height: 1.9;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+.player-bio-article p:last-child {
+  margin-bottom: 0;
+}
+
+.player-bio-empty {
+  margin: 0;
+  color: #77766f;
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .player-bio {
+    padding:
+      90px
+      clamp(20px, 5vw, 40px)
+      120px;
+  }
+
+  .player-bio-header {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .player-bio-header h2 {
+    font-size: clamp(64px, 16vw, 100px);
+  }
+
+  .player-bio-controls {
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .player-bio-reading {
+    margin-top: 70px;
+  }
+
+  .player-bio-article p {
+    font-size: 16px;
+    line-height: 1.85;
+  }
+}
+
+@media (max-width: 480px) {
+  .player-bio {
+    padding:
+      72px
+      20px
+      100px;
+  }
+
+  .player-bio-header {
+    gap: 34px;
+    padding-bottom: 32px;
+  }
+
+  .player-bio-header h2 {
+    font-size: clamp(58px, 18vw, 82px);
+  }
+
+  .player-bio-controls {
+    display: block;
+  }
+
+  .player-bio-tabs + .player-bio-tabs {
+    margin-top: 22px;
+  }
+
+  .player-bio-reading {
+    margin-top: 54px;
+  }
+
+  .player-bio-article p {
+    margin-bottom: 1.8em;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+}

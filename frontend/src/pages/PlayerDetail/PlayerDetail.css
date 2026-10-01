@@ -1,0 +1,332 @@
+.player-detail-page {
+  --bg: #0b0b0a;
+  --text: #f4f2ea;
+  --text-muted: #aaa79d;
+  --text-secondary: #c4c1b7;
+  --lime: #d8fb4c;
+  --hair: rgba(244, 242, 234, 0.14);
+
+  min-height: 100vh;
+  padding: 28px clamp(20px, 5vw, 64px) 64px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* BACK */
+.player-detail-back {
+  display: inline-block;
+  margin-bottom: 28px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  transition: color 0.2s ease;
+}
+
+.player-detail-back:visited {
+  color: var(--text-secondary);
+}
+
+.player-detail-back:hover {
+  color: var(--lime);
+}
+
+@media (max-width: 760px) {
+  .player-detail-page {
+    padding: 24px 20px 48px;
+  }
+}
+
+/* =========================================================
+  /* =========================================================
+   PLAYER DETAIL STICKY NAV
+   ========================================================= */
+
+.player-detail-nav {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+
+  width: 100%;
+
+  background: rgba(19, 19, 17, 0.96);
+  border-top: 1px solid rgba(244, 242, 234, 0.08);
+  border-bottom: 1px solid rgba(244, 242, 234, 0.14);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.player-detail-nav-inner {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-height: 58px;
+
+  padding:
+    0
+    clamp(20px, 4vw, 64px);
+}
+
+
+/* =========================================================
+   BACK TO PLAYERS
+   ========================================================= */
+
+.player-detail-nav-back {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  min-height: 58px;
+
+  color: #f4f2ea;
+  text-decoration: none;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+
+  transition: color 180ms ease;
+}
+
+.player-detail-nav-back span {
+  color: #d8fb4c;
+  font-size: 13px;
+}
+
+.player-detail-nav-back:hover {
+  color: #d8fb4c;
+}
+
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.player-detail-nav-divider {
+  flex: 0 0 auto;
+
+  width: 1px;
+  height: 20px;
+
+  margin: 0 28px;
+
+  background: rgba(244, 242, 234, 0.16);
+}
+
+
+/* =========================================================
+   SECTION NAVIGATION
+   ========================================================= */
+
+.player-detail-nav-sections {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.player-detail-nav-sections::-webkit-scrollbar {
+  display: none;
+}
+
+.player-detail-nav-sections button {
+  position: relative;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  min-height: 58px;
+
+  padding: 0 20px;
+
+  border: 0;
+  background: transparent;
+
+  color: #f4f2ea;
+
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+
+  cursor: pointer;
+
+  transition: color 180ms ease;
+}
+
+.player-detail-nav-sections button:first-child {
+  padding-left: 0;
+}
+
+.player-detail-nav-sections button::after {
+  content: '';
+
+  position: absolute;
+
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+
+  height: 2px;
+
+  background: #d8fb4c;
+
+  transform: scaleX(0);
+  transform-origin: left;
+
+  transition: transform 180ms ease;
+}
+
+.player-detail-nav-sections button:first-child::after {
+  left: 0;
+}
+
+.player-detail-nav-sections button span {
+  color: #77766f;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  transition: color 180ms ease;
+}
+
+.player-detail-nav-sections button:hover {
+  color: #d8fb4c;
+}
+
+.player-detail-nav-sections button:hover span {
+  color: #d8fb4c;
+}
+
+.player-detail-nav-sections button.is-active {
+  color: #d8fb4c;
+}
+
+.player-detail-nav-sections button.is-active span {
+  color: #d8fb4c;
+}
+
+.player-detail-nav-sections button.is-active::after {
+  transform: scaleX(1);
+}
+
+
+/* =========================================================
+   SECTION SCROLL POSITION
+   ========================================================= */
+
+.player-detail-section-anchor {
+  scroll-margin-top: 76px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .player-detail-nav-inner {
+    min-height: 52px;
+    padding: 0 20px;
+
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .player-detail-nav-inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .player-detail-nav-back {
+    min-height: 52px;
+    font-size: 10px;
+  }
+
+  .player-detail-nav-divider {
+    height: 18px;
+    margin: 0 20px;
+  }
+
+  .player-detail-nav-sections {
+    overflow: visible;
+  }
+
+  .player-detail-nav-sections button {
+    min-height: 52px;
+    padding: 0 16px;
+
+    font-size: 10px;
+  }
+
+  .player-detail-nav-sections button:first-child {
+    padding-left: 0;
+  }
+
+  .player-detail-nav-sections button::after {
+    left: 16px;
+    right: 16px;
+  }
+
+  .player-detail-nav-sections button:first-child::after {
+    left: 0;
+  }
+
+  .player-detail-section-anchor {
+    scroll-margin-top: 68px;
+  }
+}
+
+/* =========================================================
+   SECTION SCROLL POSITION
+   ========================================================= */
+
+.player-detail-section-anchor {
+  scroll-margin-top: 76px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .player-detail-nav-inner {
+    padding: 0 20px;
+  }
+
+  .player-detail-nav button {
+    min-height: 52px;
+    padding: 0 16px;
+
+    font-size: 11px;
+  }
+
+  .player-detail-nav button:first-child {
+    padding-left: 0;
+  }
+
+  .player-detail-nav button::after {
+    left: 16px;
+    right: 16px;
+  }
+
+  .player-detail-nav button:first-child::after {
+    left: 0;
+  }
+
+  .player-detail-section-anchor {
+    scroll-margin-top: 68px;
+  }
+}

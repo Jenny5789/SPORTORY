@@ -1,0 +1,178 @@
+/* =========================================================
+   PROFILE
+   ========================================================= */
+.player-profile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+  align-items: end;
+  min-height: 620px;
+  gap: clamp(32px, 6vw, 96px);
+  border-top: 1px solid var(--hair);
+}
+
+.player-profile-content {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  padding: 38px 0 clamp(56px, 8vw, 110px);
+}
+
+/* EXPLORE PLAYER */
+.player-profile-explore {
+  margin-bottom: auto;
+}
+
+.player-profile-explore > p {
+  margin: 0 0 18px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.player-profile-explore-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 40px;
+}
+
+.player-profile-explore-links a {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.player-profile-explore-links a span {
+  color: var(--lime);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.player-profile-explore-links a:hover {
+  color: var(--lime);
+}
+
+/* PLAYER IDENTITY */
+.player-profile-country {
+  margin: 0 0 18px;
+  padding-left: 6px;
+  color: var(--lime);
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.player-profile h1 {
+  margin: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(84px, 11vw, 170px);
+  font-weight: 400;
+  line-height: 0.78;
+  letter-spacing: 0.005em;
+}
+
+.player-profile h1 span {
+  display: block;
+}
+
+/* PROFILE FACTS */
+.player-profile-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(110px, 1fr));
+  max-width: 680px;
+  margin-top: 56px;
+  border-top: 1px solid var(--hair);
+}
+
+.player-profile-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 18px 18px 18px 0;
+  border-bottom: 1px solid var(--hair);
+}
+
+.fact-label {
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+.player-profile-facts strong {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+/* PLAYER IMAGE */
+.player-profile-visual {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+  min-height: 560px;
+  overflow: hidden;
+}
+
+.player-profile-visual img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: min(72vh, 720px);
+  object-fit: contain;
+  filter: drop-shadow(0 28px 52px rgba(0, 0, 0, 0.55));
+}
+
+/* LOADING */
+.player-detail-loading {
+  margin: 80px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* =========================================================
+   PROFILE MOBILE
+   ========================================================= */
+@media (max-width: 760px) {
+  .player-profile {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .player-profile-content {
+    order: 2;
+    display: block;
+    padding: 24px 0 40px;
+  }
+
+  .player-profile-explore {
+    margin-bottom: 40px;
+  }
+
+  .player-profile-visual {
+    order: 1;
+    min-height: 0;
+    height: 52vh;
+    margin-top: 36px;
+  }
+
+  .player-profile-visual img {
+    height: 100%;
+  }
+
+  .player-profile h1 {
+    font-size: clamp(68px, 22vw, 104px);
+  }
+
+  .player-profile-facts {
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 40px;
+  }
+}
