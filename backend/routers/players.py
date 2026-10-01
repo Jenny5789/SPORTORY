@@ -17,19 +17,27 @@ def get_players():
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT
-                    p.player_id,
-                    p.first_name,
-                    p.last_name,
-                    p.nationality,
-                    p.birth_date,
-                    p.height_cm,
-                    p.play_hand,
-                    pi.image_path
-                FROM players p
-                LEFT JOIN player_images pi
-                    ON p.player_id = pi.player_id
-                ORDER BY p.last_name, p.first_name
+               SELECT
+                p.player_id,
+                p.first_name,
+                p.last_name,
+                p.nationality,
+                p.birth_date,
+                p.height_cm,
+                p.play_hand,
+                pi.image_path,
+                r.singles_rank
+            FROM players p
+            LEFT JOIN player_images pi
+                ON p.player_id = pi.player_id
+            LEFT JOIN LATERAL (
+                SELECT singles_rank
+                FROM player_ranking_history
+                WHERE player_id = p.player_id
+                ORDER BY rank_date DESC
+                LIMIT 1
+            ) r ON TRUE
+            ORDER BY r.singles_rank ASC NULLS LAST
                 """
             )
 
