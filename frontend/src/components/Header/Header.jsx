@@ -26,6 +26,8 @@ function Header({ variant = 'default' }) {
             <Link to="/tennis/players">Tennis</Link>
           </div>
         </div>
+
+        <Link to="/about">About</Link>
       </nav>
     </header>
   )

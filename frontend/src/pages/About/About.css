@@ -1,0 +1,559 @@
+/* =========================================================
+   ABOUT PAGE
+========================================================= */
+
+.about-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #0b0b0a;
+  color: #f4f2ea;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.about-hero {
+  min-height: calc(100vh - 82px);
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding:
+    54px
+    clamp(32px, 5vw, 80px)
+    64px;
+
+  background: #0b0b0a;
+}
+
+.about-hero-index {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(244, 242, 234, 0.18);
+
+  color: rgba(244, 242, 234, 0.55);
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.about-hero-title {
+  padding: 64px 0;
+}
+
+.about-hero-title h1 {
+  margin: 0;
+
+  color: #f4f2ea;
+
+  font-size: clamp(72px, 9vw, 150px);
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+}
+
+.about-hero-title h1 span {
+  color: #d8fb4c;
+}
+
+.about-hero-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+.about-hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin: 0;
+
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.about-hero-kicker span {
+  color: #d8fb4c;
+}
+
+.about-hero-description {
+  max-width: 430px;
+  margin: 0;
+
+  color: rgba(244, 242, 234, 0.68);
+
+  font-size: clamp(16px, 1.2vw, 20px);
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+
+/* =========================================================
+   COMMON SECTION LABEL
+========================================================= */
+
+.about-section-label {
+  display: flex;
+  gap: 24px;
+
+  padding-bottom: 16px;
+
+  border-bottom: 1px solid rgba(11, 11, 10, 0.2);
+
+  color: rgba(11, 11, 10, 0.55);
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.about-section-label--dark {
+  border-color: rgba(244, 242, 234, 0.18);
+  color: rgba(244, 242, 234, 0.5);
+}
+
+
+/* =========================================================
+   WHAT IS SPORTORY
+========================================================= */
+
+.about-intro {
+  padding:
+    96px
+    clamp(32px, 5vw, 80px)
+    120px;
+
+  background: #f0efe8;
+  color: #0b0b0a;
+}
+
+.about-intro-content {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.15fr)
+    minmax(320px, 0.85fr);
+
+  align-items: end;
+
+  gap: clamp(60px, 9vw, 150px);
+
+  padding-top: 72px;
+}
+
+.about-intro-lead {
+  max-width: 850px;
+  margin: 0;
+
+  font-size: clamp(42px, 4.5vw, 76px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+}
+
+.about-intro-lead strong {
+  font-weight: 900;
+}
+
+.about-intro-lead strong:last-child {
+  color: #6d7e08;
+}
+
+.about-inline-plus {
+  color: #6d7e08;
+  font-weight: 900;
+}
+
+.about-intro-copy {
+  max-width: 520px;
+}
+
+.about-intro-copy p {
+  margin: 0;
+
+  color: rgba(11, 11, 10, 0.68);
+
+  font-size: clamp(15px, 1vw, 17px);
+  line-height: 1.8;
+}
+
+.about-intro-copy p + p {
+  margin-top: 24px;
+}
+
+
+/* =========================================================
+   DATA TO STORY
+========================================================= */
+
+.about-data {
+  padding:
+    96px
+    clamp(32px, 5vw, 80px)
+    120px;
+
+  background: #111310;
+  color: #f4f2ea;
+}
+
+.about-data-simple {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  align-items: end;
+
+  gap: clamp(70px, 9vw, 150px);
+
+  padding-top: 72px;
+}
+
+.about-data-copy {
+  padding-bottom: 10px;
+}
+
+.about-data-copy > span {
+  display: block;
+
+  margin-bottom: 28px;
+
+  color: #d8fb4c;
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.about-data-copy p {
+  margin: 0;
+
+  color: rgba(244, 242, 234, 0.68);
+
+  font-size: clamp(16px, 1.15vw, 19px);
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.about-data-message {
+  padding-left: clamp(36px, 4vw, 64px);
+
+  border-left: 1px solid rgba(244, 242, 234, 0.18);
+}
+
+.about-data-message h2 {
+  margin: 0;
+
+  color: #f4f2ea;
+
+  font-size: clamp(50px, 5.2vw, 88px);
+  font-weight: 900;
+  line-height: 0.86;
+  letter-spacing: -0.055em;
+}
+
+.about-data-message h2 span {
+  color: #d8fb4c;
+}
+
+.about-data-message p {
+  margin: 34px 0 0;
+
+  color: rgba(244, 242, 234, 0.6);
+
+  font-size: clamp(15px, 1vw, 17px);
+  line-height: 1.75;
+}
+
+
+/* =========================================================
+   TENNIS — FIRST STORY
+========================================================= */
+
+.about-tennis {
+  padding:
+    96px
+    clamp(32px, 5vw, 80px)
+    110px;
+
+  background: #f0efe8;
+  color: #0b0b0a;
+}
+
+.about-tennis-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.15fr)
+    minmax(320px, 0.85fr);
+
+  align-items: end;
+
+  gap: clamp(60px, 9vw, 150px);
+
+  padding-top: 72px;
+}
+
+.about-tennis-title > span {
+  display: block;
+
+  margin-bottom: 18px;
+
+  color: rgba(11, 11, 10, 0.48);
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.about-tennis-title h2 {
+  margin: 0;
+
+  color: #0b0b0a;
+
+  font-size: clamp(72px, 9vw, 150px);
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+}
+
+.about-tennis-dot {
+  color: #6d7e08;
+}
+
+.about-tennis-copy {
+  max-width: 520px;
+}
+
+.about-tennis-lead {
+  margin: 0 0 24px;
+
+  color: #0b0b0a;
+
+  font-size: clamp(21px, 1.7vw, 28px);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.about-tennis-lead strong {
+  font-weight: 900;
+}
+
+.about-tennis-copy > p:not(.about-tennis-lead) {
+  margin: 0;
+
+  color: rgba(11, 11, 10, 0.62);
+
+  font-size: clamp(15px, 1vw, 17px);
+  line-height: 1.8;
+}
+
+.about-tennis-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+
+  margin-top: 34px;
+  padding-bottom: 8px;
+
+  border-bottom: 1px solid #0b0b0a;
+
+  color: #0b0b0a;
+
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+
+  text-decoration: none;
+
+  transition:
+    gap 180ms ease,
+    color 180ms ease;
+}
+
+.about-tennis-link:hover {
+  gap: 24px;
+  color: #6d7e08;
+}
+
+
+/* =========================================================
+   ENDING
+========================================================= */
+
+.about-ending {
+  min-height: 70vh;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding:
+    90px
+    clamp(32px, 5vw, 80px)
+    46px;
+
+  background: #0b0b0a;
+  color: #f4f2ea;
+}
+
+.about-ending > p {
+  margin: 0;
+
+  color: #d8fb4c;
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.about-ending h2 {
+  margin: 90px 0;
+
+  color: #f4f2ea;
+
+  font-size: clamp(64px, 8vw, 138px);
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+}
+
+.about-ending h2 span {
+  color: #d8fb4c;
+}
+
+.about-ending-wordmark {
+  padding-top: 22px;
+
+  border-top: 1px solid rgba(244, 242, 234, 0.18);
+
+  color: #f4f2ea;
+
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  letter-spacing: 0.06em;
+}
+
+.about-ending-wordmark span {
+  color: #d8fb4c;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .about-hero {
+    min-height: 760px;
+  }
+
+  .about-hero-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .about-intro-content,
+  .about-tennis-layout {
+    grid-template-columns: 1fr;
+    gap: 54px;
+  }
+
+  .about-intro-copy,
+  .about-tennis-copy {
+    max-width: 620px;
+  }
+
+  .about-data-simple {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+
+  .about-data-message {
+    padding-top: 50px;
+    padding-left: 0;
+
+    border-top: 1px solid rgba(244, 242, 234, 0.18);
+    border-left: 0;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 640px) {
+  .about-hero {
+    min-height: 650px;
+
+    padding:
+      36px
+      20px
+      40px;
+  }
+
+  .about-hero-index span:last-child {
+    display: none;
+  }
+
+  .about-hero-title {
+    padding: 50px 0;
+  }
+
+  .about-hero-title h1 {
+    font-size: clamp(58px, 19vw, 90px);
+  }
+
+  .about-intro,
+  .about-data,
+  .about-tennis {
+    padding:
+      72px
+      20px
+      82px;
+  }
+
+  .about-intro-content,
+  .about-tennis-layout {
+    padding-top: 52px;
+  }
+
+  .about-intro-lead {
+    font-size: clamp(38px, 12vw, 58px);
+  }
+
+  .about-data-simple {
+    padding-top: 52px;
+  }
+
+  .about-data-message h2 {
+    font-size: clamp(48px, 15vw, 72px);
+  }
+
+  .about-tennis-title h2 {
+    font-size: clamp(66px, 21vw, 105px);
+  }
+
+  .about-ending {
+    min-height: 600px;
+
+    padding:
+      72px
+      20px
+      38px;
+  }
+
+  .about-ending h2 {
+    margin: 70px 0;
+
+    font-size: clamp(52px, 16vw, 86px);
+  }
+}

@@ -6,9 +6,8 @@ import PlayerQuickProfile from './components/PlayerQuickProfile/PlayerQuickProfi
 import './Players.css'
 
 const API_BASE_URL = 'http://127.0.0.1:8000'
-const SHOWCASE_INTERVAL = 3000
 
-function ArrowIcon({ direction = 'right' }) {
+function ArrowIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -16,11 +15,6 @@ function ArrowIcon({ direction = 'right' }) {
       stroke="currentColor"
       strokeWidth="2"
       aria-hidden="true"
-      style={
-        direction === 'left'
-          ? { transform: 'rotate(180deg)' }
-          : undefined
-      }
     >
       <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
@@ -30,15 +24,19 @@ function ArrowIcon({ direction = 'right' }) {
 function Players() {
   const [players, setPlayers] = useState([])
   const [rankings, setRankings] = useState({})
-  const [activeIndex, setActiveIndex] = useState(0)
   const [selectedPlayer, setSelectedPlayer] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [isShowcasePaused, setIsShowcasePaused] = useState(false)
+
+  /* =========================================================
+     LOAD PLAYERS + LATEST RANKING
+  ========================================================= */
 
   useEffect(() => {
     async function loadPlayers() {
       try {
-        const response = await fetch(`${API_BASE_URL}/players`)
+        const response = await fetch(
+          `${API_BASE_URL}/players`,
+        )
 
         if (!response.ok) {
           throw new Error('Failed to load players')
@@ -57,7 +55,8 @@ function Players() {
                 return [player.player_id, null]
               }
 
-              const rankingData = await rankingResponse.json()
+              const rankingData =
+                await rankingResponse.json()
 
               return [
                 player.player_id,
@@ -70,9 +69,14 @@ function Players() {
         )
 
         setPlayers(playerData)
-        setRankings(Object.fromEntries(rankingResults))
+        setRankings(
+          Object.fromEntries(rankingResults),
+        )
       } catch (error) {
-        console.error('Failed to load players:', error)
+        console.error(
+          'Failed to load players:',
+          error,
+        )
       } finally {
         setLoading(false)
       }
@@ -80,6 +84,10 @@ function Players() {
 
     loadPlayers()
   }, [])
+
+  /* =========================================================
+     SORT BY ATP RANKING
+  ========================================================= */
 
   const rankedPlayers = useMemo(() => {
     return [...players].sort((a, b) => {
@@ -95,65 +103,9 @@ function Players() {
     })
   }, [players, rankings])
 
-  // 등록된 선수 전체를 Showcase에 사용
-  const featuredPlayers = rankedPlayers
-
-  const activePlayer = featuredPlayers[activeIndex]
-
-  const activeRanking = activePlayer
-    ? rankings[activePlayer.player_id]
-    : null
-
-  // 선수 목록이 변경됐을 때 index 범위 보호
-  useEffect(() => {
-    if (
-      featuredPlayers.length > 0 &&
-      activeIndex >= featuredPlayers.length
-    ) {
-      setActiveIndex(0)
-    }
-  }, [activeIndex, featuredPlayers.length])
-
-  // Showcase 자동 순환
-  useEffect(() => {
-    if (
-      featuredPlayers.length <= 1 ||
-      isShowcasePaused ||
-      selectedPlayer
-    ) {
-      return
-    }
-
-    const intervalId = setInterval(() => {
-      setActiveIndex((current) =>
-        current === featuredPlayers.length - 1
-          ? 0
-          : current + 1,
-      )
-    }, SHOWCASE_INTERVAL)
-
-    return () => clearInterval(intervalId)
-  }, [
-    featuredPlayers.length,
-    isShowcasePaused,
-    selectedPlayer,
-  ])
-
-  const showPrevious = () => {
-    setActiveIndex((current) =>
-      current === 0
-        ? featuredPlayers.length - 1
-        : current - 1,
-    )
-  }
-
-  const showNext = () => {
-    setActiveIndex((current) =>
-      current === featuredPlayers.length - 1
-        ? 0
-        : current + 1,
-    )
-  }
+  /* =========================================================
+     LOADING
+  ========================================================= */
 
   if (loading) {
     return (
@@ -169,11 +121,20 @@ function Players() {
     )
   }
 
+  /* =========================================================
+     PAGE
+  ========================================================= */
+
   return (
     <>
       <Header />
 
       <main className="players-page">
+
+        {/* ===================================================
+            INTRO
+        =================================================== */}
+
         <section className="players-heading">
           <p className="players-kicker">
             TENNIS
@@ -194,110 +155,18 @@ function Players() {
           </div>
         </section>
 
-        {activePlayer && (
-          <section
-            className="players-showcase"
-            onMouseEnter={() => setIsShowcasePaused(true)}
-            onMouseLeave={() => setIsShowcasePaused(false)}
-          >
-            <button
-              type="button"
-              className="showcase-player"
-              onClick={() =>
-                setSelectedPlayer(activePlayer)
-              }
-            >
-              <div className="showcase-copy">
-                <div className="showcase-ranking">
-                  <span>ATP RANKING</span>
-
-                  <strong>
-                    {activeRanking?.singles_rank
-                      ? `#${String(
-                          activeRanking.singles_rank,
-                        ).padStart(2, '0')}`
-                      : '—'}
-                  </strong>
-                </div>
-
-                <div className="showcase-identity">
-                  <span>
-                    {activePlayer.nationality}
-                  </span>
-
-                  <h2>
-                    {activePlayer.first_name}
-                    <br />
-                    {activePlayer.last_name}
-                  </h2>
-
-                  <div className="showcase-explore">
-                    EXPLORE PLAYER
-                    <ArrowIcon />
-                  </div>
-                </div>
-              </div>
-
-              <div className="showcase-visual">
-                <span className="showcase-background-rank">
-                  {activeRanking?.singles_rank
-                    ? String(
-                        activeRanking.singles_rank,
-                      ).padStart(2, '0')
-                    : ''}
-                </span>
-
-                <img
-                  src={`${API_BASE_URL}${activePlayer.image_url}`}
-                  alt={`${activePlayer.first_name} ${activePlayer.last_name}`}
-                />
-              </div>
-            </button>
-
-            {featuredPlayers.length > 1 && (
-              <div className="showcase-controls">
-                <span>
-                  {String(activeIndex + 1).padStart(
-                    2,
-                    '0',
-                  )}
-                  {' / '}
-                  {String(
-                    featuredPlayers.length,
-                  ).padStart(2, '0')}
-                </span>
-
-                <div>
-                  <button
-                    type="button"
-                    onClick={showPrevious}
-                    aria-label="Previous player"
-                  >
-                    <ArrowIcon direction="left" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={showNext}
-                    aria-label="Next player"
-                  >
-                    <ArrowIcon />
-                  </button>
-                </div>
-              </div>
-            )}
-          </section>
-        )}
+        {/* ===================================================
+            ALL PLAYERS
+        =================================================== */}
 
         <section className="all-players">
           <div className="all-players-heading">
             <p>ALL PLAYERS</p>
 
             <span>
-              {String(rankedPlayers.length).padStart(
-                2,
-                '0',
-              )}{' '}
+              {String(
+                rankedPlayers.length,
+              ).padStart(2, '0')}{' '}
               PLAYERS
             </span>
           </div>
@@ -315,6 +184,7 @@ function Players() {
                   onClick={() =>
                     setSelectedPlayer(player)
                   }
+                  aria-label={`Open ${player.first_name} ${player.last_name} quick profile`}
                 >
                   <div className="all-player-image">
                     <span className="all-player-rank">
@@ -343,7 +213,9 @@ function Players() {
                         </strong>
                       </h3>
 
-                      <p>{player.nationality}</p>
+                      <p>
+                        {player.nationality}
+                      </p>
                     </div>
 
                     <ArrowIcon />
@@ -355,13 +227,19 @@ function Players() {
         </section>
       </main>
 
+      {/* =====================================================
+          QUICK PROFILE
+      ===================================================== */}
+
       {selectedPlayer && (
         <PlayerQuickProfile
           player={selectedPlayer}
           ranking={
             rankings[selectedPlayer.player_id]
           }
-          onClose={() => setSelectedPlayer(null)}
+          onClose={() =>
+            setSelectedPlayer(null)
+          }
         />
       )}
     </>

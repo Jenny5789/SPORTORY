@@ -41,6 +41,10 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
   const [bio, setBio] = useState(null)
   const [bioLoading, setBioLoading] = useState(true)
 
+  /* =========================================================
+     KEYBOARD / BODY
+  ========================================================= */
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
@@ -56,6 +60,10 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
       document.body.style.overflow = ''
     }
   }, [onClose])
+
+  /* =========================================================
+     BIOGRAPHY
+  ========================================================= */
 
   useEffect(() => {
     let cancelled = false
@@ -97,7 +105,11 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
     }
   }, [player.player_id])
 
-  const storyItems = useMemo(() => {
+  /* =========================================================
+     STORY DATA
+  ========================================================= */
+
+  const allStoryItems = useMemo(() => {
     if (!bio) return []
 
     const personal = Array.isArray(bio.personal)
@@ -116,16 +128,67 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
 
     return [...personal, ...career]
       .filter((item) => item.translated_text)
-      .slice(0, 3)
   }, [bio])
 
+  const [storyItems, setStoryItems] = useState([])
+
+  const pickRandomStories = () => {
+    const shuffledStories = [...allStoryItems]
+
+    for (
+      let i = shuffledStories.length - 1;
+      i > 0;
+      i -= 1
+    ) {
+      const randomIndex = Math.floor(
+        Math.random() * (i + 1),
+      )
+
+      ;[
+        shuffledStories[i],
+        shuffledStories[randomIndex],
+      ] = [
+        shuffledStories[randomIndex],
+        shuffledStories[i],
+      ]
+    }
+
+    setStoryItems(shuffledStories.slice(0, 3))
+  }
+
+  /* =========================================================
+     CARD ACTIONS
+  ========================================================= */
+
   const handleCardClick = () => {
+    // SPORT → STORY로 뒤집을 때마다
+    // 새로운 Biography 3개 선택
+    if (!isFlipped) {
+      pickRandomStories()
+    }
+
     setIsFlipped((current) => !current)
+  }
+
+  const handleCardKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+
+      if (!isFlipped) {
+        pickRandomStories()
+      }
+
+      setIsFlipped((current) => !current)
+    }
   }
 
   const stopCardAction = (event) => {
     event.stopPropagation()
   }
+
+  /* =========================================================
+     RENDER
+  ========================================================= */
 
   return (
     <div
@@ -136,13 +199,26 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
       onMouseDown={onClose}
     >
       <div
-        className={`quick-profile-flip ${isFlipped ? 'is-flipped' : ''}`}
+        className={`quick-profile-flip ${
+          isFlipped ? 'is-flipped' : ''
+        }`}
         onMouseDown={stopCardAction}
         onClick={handleCardClick}
+        onKeyDown={handleCardKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-label={
+          isFlipped
+            ? 'Flip back to player profile'
+            : 'Flip to player story'
+        }
       >
         <div className="quick-profile-inner">
 
-          {/* FRONT : SPORT */}
+          {/* =================================================
+              FRONT — SPORT
+          ================================================= */}
+
           <article className="quick-profile-face quick-profile-front">
             <button
               type="button"
@@ -181,25 +257,34 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
                 <div className="quick-profile-facts">
                   <div>
                     <span>ATP RANKING</span>
+
                     <strong>
                       {ranking?.singles_rank
-                        ? `#${String(ranking.singles_rank).padStart(2, '0')}`
+                        ? `#${String(
+                            ranking.singles_rank,
+                          ).padStart(2, '0')}`
                         : '—'}
                     </strong>
                   </div>
 
                   <div>
                     <span>POINTS</span>
+
                     <strong>
                       {ranking?.singles_points != null
-                        ? ranking.singles_points.toLocaleString()
+                        ? Number(
+                            ranking.singles_points,
+                          ).toLocaleString()
                         : '—'}
                     </strong>
                   </div>
 
                   <div>
                     <span>PLAYS</span>
-                    <strong>{player.play_hand || '—'}</strong>
+
+                    <strong>
+                      {player.play_hand || '—'}
+                    </strong>
                   </div>
                 </div>
 
@@ -217,7 +302,9 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
             <div className="quick-profile-front-visual">
               <span className="quick-profile-rank-bg">
                 {ranking?.singles_rank
-                  ? String(ranking.singles_rank).padStart(2, '0')
+                  ? String(
+                      ranking.singles_rank,
+                    ).padStart(2, '0')
                   : ''}
               </span>
 
@@ -228,7 +315,10 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
             </div>
           </article>
 
-          {/* BACK : STORY */}
+          {/* =================================================
+              BACK — STORY
+          ================================================= */}
+
           <article className="quick-profile-face quick-profile-back">
             <button
               type="button"
@@ -270,35 +360,48 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
 
                   <p>
                     기록 너머의 선수 이야기를
-                    SPORTORY가 수집한 Biography를 통해 살펴봅니다.
+                    SPORTORY가 수집한 Biography를 통해
+                    살펴봅니다.
                   </p>
                 </div>
 
-                <div className="quick-story-list">
+                <div
+                  className="quick-story-list"
+                  onClick={stopCardAction}
+                  onMouseDown={stopCardAction}
+                >
                   {bioLoading && (
                     <p className="quick-story-status">
                       Loading story...
                     </p>
                   )}
 
-                  {!bioLoading && storyItems.length === 0 && (
-                    <p className="quick-story-status">
-                      Story information is not available.
-                    </p>
-                  )}
+                  {!bioLoading &&
+                    storyItems.length === 0 && (
+                      <p className="quick-story-status">
+                        Story information is not available.
+                      </p>
+                    )}
 
                   {!bioLoading &&
                     storyItems.map((item, index) => (
                       <article
                         className="quick-story-item"
-                        key={`${item.storyCategory}-${item.item_order ?? index}`}
+                        key={`${item.storyCategory}-${
+                          item.item_order ?? index
+                        }`}
                       >
                         <div className="quick-story-meta">
                           <span>
-                            {String(index + 1).padStart(2, '0')}
+                            {String(index + 1).padStart(
+                              2,
+                              '0',
+                            )}
                           </span>
 
-                          <strong>{item.storyCategory}</strong>
+                          <strong>
+                            {item.storyCategory}
+                          </strong>
                         </div>
 
                         <p>{item.translated_text}</p>
@@ -317,6 +420,7 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
               </Link>
             </div>
           </article>
+
         </div>
       </div>
     </div>

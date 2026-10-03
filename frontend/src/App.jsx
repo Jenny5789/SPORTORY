@@ -4,6 +4,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import Home from './pages/Home/Home'
 import Players from './pages/Players/Players'
 import PlayerDetail from './pages/PlayerDetail/PlayerDetail'
+import About from './pages/About/About'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -22,16 +23,12 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-
-        <Route
-          path="/tennis/players"
-          element={<Players />}
-        />
-
+        <Route path="/tennis/players" element={<Players />} />
         <Route
           path="/tennis/players/:playerId"
           element={<PlayerDetail />}
         />
+        <Route path="/about" element={<About />} />
       </Routes>
     </>
   )

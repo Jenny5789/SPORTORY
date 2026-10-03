@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
 
+/* =========================================================
+   OVERLAY / FLIP
+========================================================= */
+
 .quick-profile-overlay {
   position: fixed;
   inset: 0;
@@ -12,6 +16,7 @@
   padding: clamp(20px, 4vw, 56px);
 
   background: rgba(0, 0, 0, 0.8);
+
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -22,6 +27,8 @@
 
   perspective: 1800px;
   cursor: pointer;
+
+  outline: none;
 }
 
 .quick-profile-inner {
@@ -55,6 +62,7 @@
   width: 100%;
   height: 100%;
 
+  box-sizing: border-box;
   overflow: hidden;
 
   border: 1px solid var(--hair);
@@ -70,18 +78,9 @@
   box-shadow: 0 30px 100px rgba(0, 0, 0, 0.58);
 }
 
-.quick-profile-front {
-  display: grid;
-  grid-template-columns:
-    minmax(360px, 0.85fr)
-    minmax(420px, 1.15fr);
-
-  transform: rotateY(0deg);
-}
-
-.quick-profile-back {
-  transform: rotateY(180deg);
-}
+/* =========================================================
+   CLOSE
+========================================================= */
 
 .quick-profile-close {
   position: absolute;
@@ -115,7 +114,23 @@
   color: var(--lime);
 }
 
-/* FRONT */
+/* =========================================================
+   FRONT — SPORT
+========================================================= */
+
+.quick-profile-front {
+  display: grid;
+
+  grid-template-columns:
+    minmax(360px, 0.85fr)
+    minmax(420px, 1.15fr);
+
+  transform: rotateY(0deg);
+}
+
+.quick-profile-back {
+  transform: rotateY(180deg);
+}
 
 .quick-profile-front-copy {
   position: relative;
@@ -136,6 +151,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+
   gap: 18px;
 }
 
@@ -149,9 +165,14 @@
   letter-spacing: 0.18em;
 }
 
+/* =========================================================
+   FLIP GUIDE
+========================================================= */
+
 .quick-profile-flip-guide {
   display: inline-flex;
   align-items: center;
+
   gap: 10px;
 
   padding: 10px 14px;
@@ -163,12 +184,18 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
+
+  pointer-events: none;
 }
 
 .quick-profile-flip-guide svg {
   width: 18px;
   height: 18px;
 }
+
+/* =========================================================
+   PLAYER NAME
+========================================================= */
 
 .quick-profile-name > p {
   margin: 0 0 14px;
@@ -197,9 +224,15 @@
   display: block;
 }
 
+/* =========================================================
+   PLAYER FACTS
+========================================================= */
+
 .quick-profile-facts {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
 
   border-top: 1px solid var(--hair);
   border-bottom: 1px solid var(--hair);
@@ -208,6 +241,7 @@
 .quick-profile-facts > div {
   display: flex;
   flex-direction: column;
+
   gap: 9px;
 
   min-width: 0;
@@ -235,13 +269,20 @@
   line-height: 1;
 }
 
+/* =========================================================
+   DETAIL LINK
+========================================================= */
+
 .quick-profile-detail-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 24px;
 
   width: 100%;
+
+  box-sizing: border-box;
 
   margin-top: 28px;
   padding: 17px 0;
@@ -269,6 +310,10 @@
   transform: translateX(5px);
 }
 
+/* =========================================================
+   PLAYER VISUAL
+========================================================= */
+
 .quick-profile-front-visual {
   position: relative;
 
@@ -290,8 +335,6 @@
 }
 
 .quick-profile-front-visual::after {
-  content: '';
-
   position: absolute;
   right: 0;
   bottom: 0;
@@ -306,6 +349,8 @@
       rgba(10, 10, 9, 0.72),
       transparent
     );
+
+  content: '';
 }
 
 .quick-profile-front-visual img {
@@ -321,7 +366,10 @@
   object-fit: contain;
   object-position: center bottom;
 
-  filter: drop-shadow(0 30px 54px rgba(0, 0, 0, 0.5));
+  filter:
+    drop-shadow(
+      0 30px 54px rgba(0, 0, 0, 0.5)
+    );
 }
 
 .quick-profile-rank-bg {
@@ -339,7 +387,9 @@
   user-select: none;
 }
 
-/* STORY */
+/* =========================================================
+   STORY
+========================================================= */
 
 .quick-story {
   display: flex;
@@ -347,6 +397,8 @@
 
   width: 100%;
   height: 100%;
+
+  box-sizing: border-box;
 
   padding:
     clamp(40px, 5vw, 68px)
@@ -365,6 +417,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 60px;
 
   padding-right: 60px;
@@ -390,13 +443,27 @@
   background: var(--hair);
 }
 
+/* =========================================================
+   STORY BODY
+========================================================= */
+
 .quick-story-body {
   display: grid;
-  grid-template-columns: minmax(180px, 0.32fr) minmax(0, 1fr);
+
+  grid-template-columns:
+    minmax(180px, 0.32fr)
+    minmax(0, 1fr);
+
   gap: clamp(36px, 5vw, 80px);
 
+  min-width: 0;
   min-height: 0;
+
   flex: 1;
+}
+
+.quick-story-intro {
+  min-width: 0;
 }
 
 .quick-story-intro span {
@@ -421,10 +488,16 @@
   line-height: 1.7;
 }
 
+/* =========================================================
+   STORY LIST
+========================================================= */
+
 .quick-story-list {
+  min-width: 0;
   min-height: 0;
 
   overflow-y: auto;
+  overflow-x: hidden;
 
   padding-right: 18px;
 
@@ -436,8 +509,14 @@
 
 .quick-story-item {
   display: grid;
-  grid-template-columns: 90px minmax(0, 1fr);
+
+  grid-template-columns:
+    90px
+    minmax(0, 1fr);
+
   gap: 28px;
+
+  min-width: 0;
 
   padding: 0 0 24px;
 }
@@ -451,6 +530,7 @@
 .quick-story-meta {
   display: flex;
   flex-direction: column;
+
   gap: 7px;
 }
 
@@ -471,6 +551,8 @@
 }
 
 .quick-story-item > p {
+  min-width: 0;
+
   margin: 0;
 
   color: #d8d5cb;
@@ -478,6 +560,8 @@
   font-size: clamp(14px, 1.15vw, 17px);
   line-height: 1.75;
 
+  white-space: normal;
+  overflow-wrap: break-word;
   word-break: keep-all;
 }
 
@@ -488,11 +572,14 @@
 }
 
 .quick-story-detail-link {
-  margin-top: 24px;
   flex: 0 0 auto;
+
+  margin-top: 24px;
 }
 
-/* RESPONSIVE */
+/* =========================================================
+   TABLET
+========================================================= */
 
 @media (max-width: 850px) {
   .quick-profile-overlay {
@@ -552,6 +639,7 @@
 
   .quick-story-body {
     grid-template-columns: 1fr;
+
     gap: 24px;
   }
 
@@ -560,10 +648,17 @@
   }
 
   .quick-story-item {
-    grid-template-columns: 62px minmax(0, 1fr);
+    grid-template-columns:
+      62px
+      minmax(0, 1fr);
+
     gap: 20px;
   }
 }
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 520px) {
   .quick-profile-overlay {
