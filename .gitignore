@@ -9,7 +9,7 @@ __pycache__/
 # Collected / processed data
 data/raw/
 data/processed/
-data/player_images/
+
 
 # Frontend
 frontend/node_modules/
@@ -21,3 +21,6 @@ frontend/dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Database backups
+*.dump
