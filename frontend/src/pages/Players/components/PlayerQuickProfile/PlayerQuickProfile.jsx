@@ -127,8 +127,9 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
         }))
       : []
 
-    return [...personal, ...career]
-      .filter((item) => item.translated_text)
+    return [...personal, ...career].filter(
+      (item) => item.translated_text,
+    )
   }, [bio])
 
   const [storyItems, setStoryItems] = useState([])
@@ -156,6 +157,16 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
 
     setStoryItems(shuffledStories.slice(0, 3))
   }
+
+  /* =========================================================
+     LOAD STORY AFTER BIOGRAPHY
+  ========================================================= */
+
+  useEffect(() => {
+    if (allStoryItems.length > 0) {
+      pickRandomStories()
+    }
+  }, [allStoryItems])
 
   /* =========================================================
      CARD ACTIONS
