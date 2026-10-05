@@ -63,6 +63,8 @@ def collect_player_stats(player_id):
 
             response_url = response.get("url", "")
 
+            print(f"Response URL: {response_url}")
+
             if target_pattern not in response_url:
                 continue
 
