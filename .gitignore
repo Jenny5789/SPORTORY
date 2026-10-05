@@ -6,6 +6,9 @@ __pycache__/
 .env
 .env.*
 
+# Player images
+data/player_images/
+
 # Collected / processed data
 data/raw/
 data/processed/

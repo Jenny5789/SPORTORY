@@ -8,186 +8,178 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 
-player_id = input("ATP Player ID를 입력하세요: ").strip().lower()
-player_slug = input("ATP Player Slug를 입력하세요: ").strip().lower()
+def collect_player_overview(player_id, player_slug):
+    player_id = player_id.strip().lower()
+    player_slug = player_slug.strip().lower()
 
-overview_url = (
-    f"https://www.atptour.com/en/players/"
-    f"{player_slug}/{player_id}/overview"
-)
+    overview_url = (
+        f"https://www.atptour.com/en/players/"
+        f"{player_slug}/{player_id}/overview"
+    )
 
-target_pattern = f"/players/hero/{player_id}"
+    target_pattern = f"/players/hero/{player_id}"
 
+    os.makedirs("data/raw", exist_ok=True)
 
-os.makedirs("data/raw", exist_ok=True)
+    options = Options()
 
+    options.set_capability(
+        "goog:loggingPrefs",
+        {"performance": "ALL"}
+    )
 
-options = Options()
+    driver = webdriver.Chrome(options=options)
 
-options.set_capability(
-    "goog:loggingPrefs",
-    {"performance": "ALL"}
-)
+    driver.execute_cdp_cmd(
+        "Network.enable",
+        {}
+    )
 
-driver = webdriver.Chrome(options=options)
+    try:
+        print("\nATP 선수 Overview 페이지 접속")
+        print(f"Player ID: {player_id}")
+        print(f"Player Slug: {player_slug}")
+        print(f"URL: {overview_url}")
 
-driver.execute_cdp_cmd(
-    "Network.enable",
-    {}
-)
+        driver.get(overview_url)
 
-try:
-    print("\nATP 선수 Overview 페이지 접속")
-    print(f"Player ID: {player_id}")
-    print(f"Player Slug: {player_slug}")
-    print(f"URL: {overview_url}")
+        time.sleep(5)
 
-    driver.get(overview_url)
+        performance_logs = driver.get_log("performance")
 
-    time.sleep(5)
+        overview_data = None
+        source_url = None
+        response_status = None
+        mime_type = None
 
-    performance_logs = driver.get_log("performance")
+        for log in performance_logs:
+            message = json.loads(log["message"])["message"]
 
-    overview_data = None
-    source_url = None
-    response_status = None
-    mime_type = None
+            if message["method"] != "Network.responseReceived":
+                continue
 
-    for log in performance_logs:
-        message = json.loads(log["message"])["message"]
+            params = message["params"]
+            response = params["response"]
 
-        if message["method"] != "Network.responseReceived":
-            continue
+            response_url = response.get("url", "")
 
-        params = message["params"]
-        response = params["response"]
+            if target_pattern not in response_url:
+                continue
 
-        response_url = response.get("url", "")
+            print("\nOverview 데이터 응답 발견")
+            print(f"Response URL: {response_url}")
+            print(f"Status: {response.get('status')}")
+            print(f"MIME Type: {response.get('mimeType')}")
 
-        if target_pattern not in response_url:
-            continue
+            request_id = params["requestId"]
 
-        print("\nOverview 데이터 응답 발견")
-        print(f"Response URL: {response_url}")
-        print(f"Status: {response.get('status')}")
-        print(f"MIME Type: {response.get('mimeType')}")
+            try:
+                body_result = driver.execute_cdp_cmd(
+                    "Network.getResponseBody",
+                    {"requestId": request_id}
+                )
 
-        request_id = params["requestId"]
+                body = body_result["body"]
 
-        try:
-            body_result = driver.execute_cdp_cmd(
-                "Network.getResponseBody",
-                {"requestId": request_id}
+                if body_result.get("base64Encoded"):
+                    body = base64.b64decode(body).decode("utf-8")
+
+                response_json = json.loads(body)
+
+                overview_data = response_json
+                source_url = response_url
+                response_status = response.get("status")
+                mime_type = response.get("mimeType")
+
+                break
+
+            except Exception as error:
+                print(f"응답 Body 읽기 실패: {error}")
+
+        if overview_data is None:
+            raise RuntimeError(
+                "Overview 데이터 응답을 찾지 못했습니다."
             )
 
-            body = body_result["body"]
+        # ATP 응답 구조 확인
+        if (
+            isinstance(overview_data, dict)
+            and isinstance(overview_data.get("data"), dict)
+        ):
+            player_data = overview_data["data"]
+        else:
+            player_data = overview_data
 
-            if body_result.get("base64Encoded"):
-                body = base64.b64decode(body).decode("utf-8")
+        required_fields = [
+            "FirstName",
+            "LastName",
+            "BirthDate",
+            "NatlId",
+            "Nationality",
+            "HeightCm",
+            "WeightKg",
+            "PlayHand",
+            "BackHand",
+            "ProYear"
+        ]
 
-            response_json = json.loads(body)
+        missing_fields = [
+            field
+            for field in required_fields
+            if field not in player_data
+        ]
 
-            overview_data = response_json
-            source_url = response_url
-            response_status = response.get("status")
-            mime_type = response.get("mimeType")
+        if missing_fields:
+            raise RuntimeError(
+                "필수 Overview 필드가 없습니다: "
+                + ", ".join(missing_fields)
+            )
 
-            break
+        raw_data = {
+            "source": "ATP",
+            "source_type": "player_overview",
+            "player_id": player_id,
+            "source_url": source_url,
+            "saved_at": datetime.now().astimezone().isoformat(),
+            "collection_method": "selenium_cdp",
+            "response_status": response_status,
+            "mime_type": mime_type,
+            "data": player_data
+        }
 
-        except Exception as error:
-            print(f"응답 Body 읽기 실패: {error}")
+        output_path = f"data/raw/{player_id}_overview.json"
 
-    if overview_data is None:
-        raise RuntimeError(
-            "Overview 데이터 응답을 찾지 못했습니다."
+        with open(
+            output_path,
+            "w",
+            encoding="utf-8"
+        ) as file:
+            json.dump(
+                raw_data,
+                file,
+                ensure_ascii=False,
+                indent=4
+            )
+
+        print("\nOverview 수집 완료")
+        print(
+            f"Player: "
+            f"{player_data.get('FirstName')} "
+            f"{player_data.get('LastName')}"
         )
+        print(f"저장 위치: {output_path}")
 
-    # ATP 응답 구조 확인
-    #
-    # 응답 자체가 선수 데이터인 경우:
-    # {
-    #   "FirstName": "...",
-    #   "LastName": "...",
-    #   ...
-    # }
-    #
-    # 응답이 data로 한 번 감싸져 있는 경우:
-    # {
-    #   "data": {
-    #       "FirstName": "...",
-    #       ...
-    #   }
-    # }
-    #
-    # 두 경우 모두 SPORTORY Raw 구조에서는
-    # raw_data["data"]가 실제 선수 데이터가 되도록 맞춘다.
+    finally:
+        driver.quit()
 
-    if (
-        isinstance(overview_data, dict)
-        and isinstance(overview_data.get("data"), dict)
-    ):
-        player_data = overview_data["data"]
-    else:
-        player_data = overview_data
 
-    required_fields = [
-        "FirstName",
-        "LastName",
-        "BirthDate",
-        "NatlId",
-        "Nationality",
-        "HeightCm",
-        "WeightKg",
-        "PlayHand",
-        "BackHand",
-        "ProYear"
-    ]
+if __name__ == "__main__":
+    player_id = input(
+        "ATP Player ID를 입력하세요: "
+    ).strip().lower()
 
-    missing_fields = [
-        field
-        for field in required_fields
-        if field not in player_data
-    ]
+    player_slug = input(
+        "ATP Player Slug를 입력하세요: "
+    ).strip().lower()
 
-    if missing_fields:
-        raise RuntimeError(
-            "필수 Overview 필드가 없습니다: "
-            + ", ".join(missing_fields)
-        )
-
-    raw_data = {
-        "source": "ATP",
-        "source_type": "player_overview",
-        "player_id": player_id,
-        "source_url": source_url,
-        "saved_at": datetime.now().astimezone().isoformat(),
-        "collection_method": "selenium_cdp",
-        "response_status": response_status,
-        "mime_type": mime_type,
-        "data": player_data
-    }
-
-    output_path = f"data/raw/{player_id}_overview.json"
-
-    with open(
-        output_path,
-        "w",
-        encoding="utf-8"
-    ) as file:
-        json.dump(
-            raw_data,
-            file,
-            ensure_ascii=False,
-            indent=4
-        )
-
-    print("\nOverview 수집 완료")
-    print(
-        f"Player: "
-        f"{player_data.get('FirstName')} "
-        f"{player_data.get('LastName')}"
-    )
-    print(f"저장 위치: {output_path}")
-
-finally:
-    driver.quit()
+    collect_player_overview(player_id, player_slug)

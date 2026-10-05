@@ -7,142 +7,153 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 
-player_id = input("ATP Player ID를 입력하세요: ").strip().lower()
-player_slug = input("ATP Player Slug를 입력하세요: ").strip().lower()
+def collect_player_activity(player_id, player_slug):
+    player_id = player_id.strip().lower()
+    player_slug = player_slug.strip().lower()
 
-activity_page_url = (
-    f"https://www.atptour.com/en/players/"
-    f"{player_slug}/{player_id}/player-activity"
-)
+    activity_page_url = (
+        f"https://www.atptour.com/en/players/"
+        f"{player_slug}/{player_id}/player-activity"
+    )
 
-target_pattern = f"/activity/sgl/{player_id}/"
+    target_pattern = f"/activity/sgl/{player_id}/"
 
+    os.makedirs("data/raw", exist_ok=True)
 
-os.makedirs("data/raw", exist_ok=True)
+    options = Options()
 
+    options.set_capability(
+        "goog:loggingPrefs",
+        {"performance": "ALL"}
+    )
 
-options = Options()
+    driver = webdriver.Chrome(options=options)
 
-options.set_capability(
-    "goog:loggingPrefs",
-    {"performance": "ALL"}
-)
+    driver.execute_cdp_cmd(
+        "Network.enable",
+        {}
+    )
 
-driver = webdriver.Chrome(options=options)
+    try:
+        print("\nATP 선수 Player Activity 페이지 접속")
+        print(f"Player ID: {player_id}")
+        print(f"Player Slug: {player_slug}")
+        print(f"URL: {activity_page_url}")
 
-driver.execute_cdp_cmd(
-    "Network.enable",
-    {}
-)
+        driver.get(activity_page_url)
 
-try:
-    print("\nATP 선수 Player Activity 페이지 접속")
-    print(f"Player ID: {player_id}")
-    print(f"Player Slug: {player_slug}")
-    print(f"URL: {activity_page_url}")
+        time.sleep(5)
 
-    driver.get(activity_page_url)
+        performance_logs = driver.get_log("performance")
 
-    time.sleep(5)
+        activity_data = None
+        source_url = None
 
-    performance_logs = driver.get_log("performance")
+        for log in performance_logs:
+            message = json.loads(log["message"])["message"]
 
-    activity_data = None
-    source_url = None
+            if message["method"] != "Network.responseReceived":
+                continue
 
-    for log in performance_logs:
-        message = json.loads(log["message"])["message"]
+            params = message["params"]
+            response = params["response"]
 
-        if message["method"] != "Network.responseReceived":
-            continue
+            response_url = response.get("url", "")
 
-        params = message["params"]
-        response = params["response"]
+            if target_pattern not in response_url:
+                continue
 
-        response_url = response.get("url", "")
+            print("\nActivity 응답 발견")
+            print(f"Response URL: {response_url}")
+            print(f"Status: {response.get('status')}")
+            print(f"MIME Type: {response.get('mimeType')}")
 
-        if target_pattern not in response_url:
-            continue
+            request_id = params["requestId"]
 
-        print("\nActivity 응답 발견")
-        print(f"Response URL: {response_url}")
-        print(f"Status: {response.get('status')}")
-        print(f"MIME Type: {response.get('mimeType')}")
+            try:
+                body_result = driver.execute_cdp_cmd(
+                    "Network.getResponseBody",
+                    {"requestId": request_id}
+                )
 
-        request_id = params["requestId"]
+                body = body_result["body"]
 
-        try:
-            body_result = driver.execute_cdp_cmd(
-                "Network.getResponseBody",
-                {"requestId": request_id}
+                if body_result.get("base64Encoded"):
+                    body = base64.b64decode(body).decode("utf-8")
+
+                activity_data = json.loads(body)
+                source_url = response_url
+
+                break
+
+            except Exception as error:
+                print(f"응답 Body 읽기 실패: {error}")
+
+        if activity_data is None:
+            raise RuntimeError(
+                "Activity 응답을 찾지 못했습니다."
             )
 
-            body = body_result["body"]
+        if "PlayerId" not in activity_data:
+            raise RuntimeError(
+                "Activity 응답에 PlayerId 필드가 없습니다."
+            )
 
-            if body_result.get("base64Encoded"):
-                body = base64.b64decode(body).decode("utf-8")
+        if activity_data["PlayerId"].lower() != player_id:
+            raise RuntimeError(
+                "요청한 Player ID와 Activity 응답의 PlayerId가 다릅니다."
+            )
 
-            activity_data = json.loads(body)
-            source_url = response_url
+        if "Activity" not in activity_data:
+            raise RuntimeError(
+                "Activity 응답에 Activity 필드가 없습니다."
+            )
 
-            break
+        if not isinstance(activity_data["Activity"], list):
+            raise RuntimeError(
+                "Activity 데이터가 리스트 형식이 아닙니다."
+            )
 
-        except Exception as error:
-            print(f"응답 Body 읽기 실패: {error}")
-
-    if activity_data is None:
-        raise RuntimeError(
-            "Activity 응답을 찾지 못했습니다."
+        output_path = (
+            f"data/raw/"
+            f"{player_id}_activity_response.json"
         )
 
-    if "PlayerId" not in activity_data:
-        raise RuntimeError(
-            "Activity 응답에 PlayerId 필드가 없습니다."
+        with open(
+            output_path,
+            "w",
+            encoding="utf-8"
+        ) as file:
+            json.dump(
+                activity_data,
+                file,
+                ensure_ascii=False,
+                indent=4
+            )
+
+        tournament_count = sum(
+            len(activity.get("Tournaments", []))
+            for activity in activity_data["Activity"]
         )
 
-    if activity_data["PlayerId"].lower() != player_id:
-        raise RuntimeError(
-            "요청한 Player ID와 Activity 응답의 PlayerId가 다릅니다."
-        )
+        print("\nActivity 수집 완료")
+        print(f"Player ID: {player_id}")
+        print(f"연도 그룹 수: {len(activity_data['Activity'])}")
+        print(f"대회 수: {tournament_count}")
+        print(f"Source URL: {source_url}")
+        print(f"저장 위치: {output_path}")
 
-    if "Activity" not in activity_data:
-        raise RuntimeError(
-            "Activity 응답에 Activity 필드가 없습니다."
-        )
+    finally:
+        driver.quit()
 
-    if not isinstance(activity_data["Activity"], list):
-        raise RuntimeError(
-            "Activity 데이터가 리스트 형식이 아닙니다."
-        )
 
-    output_path = (
-        f"data/raw/"
-        f"{player_id}_activity_response.json"
-    )
+if __name__ == "__main__":
+    player_id = input(
+        "ATP Player ID를 입력하세요: "
+    ).strip().lower()
 
-    with open(
-        output_path,
-        "w",
-        encoding="utf-8"
-    ) as file:
-        json.dump(
-            activity_data,
-            file,
-            ensure_ascii=False,
-            indent=4
-        )
+    player_slug = input(
+        "ATP Player Slug를 입력하세요: "
+    ).strip().lower()
 
-    tournament_count = sum(
-        len(activity.get("Tournaments", []))
-        for activity in activity_data["Activity"]
-    )
-
-    print("\nActivity 수집 완료")
-    print(f"Player ID: {player_id}")
-    print(f"연도 그룹 수: {len(activity_data['Activity'])}")
-    print(f"대회 수: {tournament_count}")
-    print(f"Source URL: {source_url}")
-    print(f"저장 위치: {output_path}")
-
-finally:
-    driver.quit()
+    collect_player_activity(player_id, player_slug)
