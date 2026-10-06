@@ -1,6 +1,8 @@
 import os
 import random
 import time
+import logging
+from datetime import datetime
 
 import psycopg
 from dotenv import load_dotenv
@@ -22,7 +24,24 @@ from save_player_image_to_db import save_player_image_to_db
 load_dotenv()
 
 
+# 로그 폴더 생성
+os.makedirs("logs", exist_ok=True)
+
+# 날짜별 월간 수집 로그
+log_file = f"logs/monthly_collection_{datetime.now():%Y-%m-%d}.log"
+
+logging.basicConfig(
+    filename=log_file,
+    level=logging.INFO,
+    format="%(asctime)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    encoding="utf-8"
+)
+
+
 def run_monthly_collection():
+
+    logging.info("[START] 월간 수집 시작")
 
     conn = psycopg.connect(
         host=os.getenv("DB_HOST"),
@@ -59,6 +78,8 @@ def run_monthly_collection():
         print("월간 수집 대상:", player_id, player_slug)
         print("=" * 60)
 
+        results = []
+
         # 1. Profile
         try:
             print("\n[Profile]")
@@ -68,10 +89,15 @@ def run_monthly_collection():
             save_player_to_db(player_id, player_slug)
 
             print(f"[성공] Profile: {player_id}")
+            results.append("Profile")
 
         except Exception as e:
             print(f"[실패] Profile: {player_id}")
             print(f"오류: {e}")
+
+            logging.error(
+                f"[ERROR] {player_id} Profile - {e}"
+            )
 
         # 2. Bio
         try:
@@ -92,10 +118,15 @@ def run_monthly_collection():
                 print("Bio 변경 없음 → Gemini 번역 생략")
 
             print(f"[성공] Bio: {player_id}")
+            results.append("Bio")
 
         except Exception as e:
             print(f"[실패] Bio: {player_id}")
             print(f"오류: {e}")
+
+            logging.error(
+                f"[ERROR] {player_id} Bio - {e}"
+            )
 
         # 3. Image
         try:
@@ -105,14 +136,25 @@ def run_monthly_collection():
             save_player_image_to_db(player_id)
 
             print(f"[성공] Image: {player_id}")
+            results.append("Image")
 
         except Exception as e:
             print(f"[실패] Image: {player_id}")
             print(f"오류: {e}")
 
+            logging.error(
+                f"[ERROR] {player_id} Image - {e}"
+            )
+
+        # 선수별 성공 결과 기록
+        if results:
+            logging.info(
+                f"[SUCCESS] {player_id} {' / '.join(results)}"
+            )
+
         # 마지막 선수 뒤에는 대기하지 않음
         if index < len(players) - 1:
-            wait_time = random.uniform(5, 15)
+            wait_time = random.uniform(5, 10)
 
             print(
                 f"\n다음 선수 수집까지 "
@@ -125,6 +167,8 @@ def run_monthly_collection():
     print("=" * 60)
     print("월간 선수 데이터 수집 완료")
     print("=" * 60)
+
+    logging.info("[END] 월간 수집 완료")
 
 
 if __name__ == "__main__":
