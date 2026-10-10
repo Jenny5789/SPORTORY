@@ -52,7 +52,7 @@ def get_players():
         image_url = None
 
         if row[7]:
-            image_url = f"/images/{row[0]}.png"
+            image_url = row[7]
 
         players.append(
             {
@@ -167,7 +167,7 @@ def get_player(player_id: str):
     image_url = None
 
     if row[10]:
-        image_url = f"/images/{player_id}.png"
+        image_url = row[10]
 
     return {
         "player_id": row[0],

@@ -86,7 +86,7 @@ function PlayerProfile({ player }) {
       <div className="player-profile-visual">
         {player.image_url && (
           <img
-            src={`${API_BASE_URL}${player.image_url}`}
+            src={player.image_url}
             alt={`${player.first_name} ${player.last_name}`}
           />
         )}

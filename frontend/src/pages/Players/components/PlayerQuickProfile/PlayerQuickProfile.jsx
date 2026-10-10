@@ -321,7 +321,7 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
               </span>
 
               <img
-                src={`${API_BASE_URL}${player.image_url}`}
+                src={player.image_url}
                 alt={`${player.first_name} ${player.last_name}`}
               />
             </div>

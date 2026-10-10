@@ -347,7 +347,7 @@ function Home() {
               >
                 <img
                   key={activePlayer.player_id}
-                  src={`${API_BASE}${activePlayer.image_url}`}
+                  src={activePlayer.image_url}
                   alt={`${activePlayer.first_name} ${activePlayer.last_name}`}
                 />
               </button>
