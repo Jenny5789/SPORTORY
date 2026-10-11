@@ -1,127 +1,156 @@
 # SPORTORY
 
-**SPORTORY = SPORTS + STORY**
+> 선수 기록과 Biography를 연결해 선수의 이야기를 제공하는 개인 프로젝트
 
-스포츠의 선수, 경기, 기록과 그 안의 이야기를 데이터 기반으로 제공하는 스포츠 정보 서비스입니다.
+SPORTORY = SPORT + STORY
 
-현재는 첫 번째 구현 대상으로 **Tennis**를 개발하고 있으며,
-ATP 선수 데이터를 수집·가공·저장하고 이를 웹 서비스에서 제공하는 전체 데이터 파이프라인을 구축했습니다.
+스포츠 데이터를 단순히 나열하는 대신, 선수의 기록과 정보를 한곳에 연결해 보여주는 스포츠 정보 서비스입니다.
 
----
+첫 번째 종목으로 테니스를 선택했습니다. ATP 선수 데이터를 수집하고, 원본 데이터를 보존한 뒤 서비스에 필요한 형태로 정제·저장합니다. 이후 FastAPI와 React를 통해 선수 목록과 상세 정보를 제공합니다.
 
-## 1. Project
+## Links
 
-SPORTORY는 스포츠 데이터를 단순히 나열하는 것이 아니라,
-선수의 기록과 정보를 연결하여 스포츠와 선수를 이해할 수 있도록 하는 것을 목표로 합니다.
+- [SPORTORY 바로가기](https://sportory.vercel.app/)
+- [GitHub 저장소](https://github.com/Jenny5789/SPORTORY)
 
-현재 Tennis를 중심으로 다음 데이터를 제공합니다.
-
-- 선수 기본 정보
-- 선수 이미지
-- ATP Ranking History
-- Match
-- Statistics
-- Biography
-- Biography Korean Translation
-
-현재 검증된 주요 선수 외에도 동일한 데이터 수집 구조를 이용하여 선수를 추가할 수 있도록 구성했습니다.
-
----
-
-## 2. Service
+## Screenshots
 
 ### Home
 
-SPORTORY의 전체 방향을 소개하고 현재 이용 가능한 스포츠인 Tennis로 진입할 수 있습니다.
+SPORTORY의 전체 방향과 현재 제공하는 테니스 서비스를 소개합니다.
 
-### Tennis Players
+<img src="docs/images/home.png" width="80%" alt="SPORTORY Home" />
 
-수집된 선수 목록과 현재 랭킹 정보를 확인할 수 있습니다.
+### Players
 
-### Player Detail
+수집된 선수 목록과 현재 순위를 확인할 수 있습니다.
 
-선수별 상세 정보를 제공합니다.
+<img src="docs/images/players.png" width="80%" alt="SPORTORY Players" />
 
-- Profile
-- Ranking
-- Matches
-- Statistics
-- Biography
-- Korean Translation
+### Player Profile and Story
 
-### Player Story
+선수 카드의 앞면에서는 프로필과 주요 기록을 확인하고, 카드를 뒤집으면 Biography Story를 확인할 수 있습니다.
 
-선수의 Biography 데이터를 활용하여 기록 이외의 선수 정보를 Story 형태로 제공합니다.
+<img src="docs/images/profile.png" width="80%" alt="SPORTORY Player Profile" />
 
----
+### Random Biography Story
 
-## 3. Data Pipeline
+선수 카드를 클릭하면 Personal · Career Biography 항목 중 3개를 랜덤하게 보여줍니다.
 
-SPORTORY는 외부 데이터를 실시간으로 사용자에게 직접 요청하는 방식이 아니라,
-데이터를 먼저 수집하고 저장한 뒤 Backend API를 통해 제공합니다.
+<table>
+  <tr>
+    <td><img src="docs/images/story-1.png" width="100%" alt="Random Biography Story 1" /></td>
+    <td><img src="docs/images/story-2.png" width="100%" alt="Random Biography Story 2" /></td>
+  </tr>
+</table>
+
+### Ranking
+
+선수의 현재 순위와 순위 이력을 확인할 수 있습니다.
+
+<img src="docs/images/ranking.png" width="80%" alt="SPORTORY Ranking" />
+
+## Project Overview
+
+SPORTORY가 제공하는 핵심 정보는 다음과 같습니다.
+
+- 선수 기본 정보와 이미지
+- ATP 단식 순위와 순위 이력
+- 선수 경기와 대회 정보
+- 선수 통계
+- 선수 Biography 원문
+- Biography 한국어 번역
+
+서비스의 기본 사용자 흐름은 다음과 같습니다.
+
+```text
+Home → Tennis → Players → Player Detail
+```
+
+선수 상세 화면에서는 Profile, Ranking, Matches, Statistics, Biography를 함께 확인할 수 있습니다.
+
+## Why SPORTORY
+
+기존 스포츠 서비스는 기록과 순위 중심으로 제공되는 경우가 많습니다. SPORTORY는 선수의 기록에 Biography와 주요 경력을 연결해, 숫자만으로는 알기 어려운 선수의 배경과 이야기를 함께 보여주는 것을 목표로 합니다.
+
+## Data Pipeline
 
 ```text
 ATP Web Source
       ↓
 Data Collection
       ↓
-Raw Data
+Raw Data Storage
       ↓
 Data Processing
       ↓
-AI Translation
+Biography Translation
       ↓
 PostgreSQL
       ↓
 FastAPI
       ↓
-Frontend
-      ↓
-User
+React Frontend
 ```
 
-### Collection
+### 1. Data Collection
 
-ATP Web Source에서 선수 및 관련 데이터를 수집합니다.
+ATP 페이지의 동적 데이터를 브라우저 환경에서 확인하고, 데이터가 제공되는 형태에 따라 수집 방식을 나눴습니다.
 
-웹 페이지의 동적 데이터 처리를 위해 Browser Automation을 사용했습니다.
+- Profile, Ranking, Matches, Statistics, Image: Network Response 기반 수집
+- Biography: HTML에 렌더링된 Personal·Career 영역 수집
+- Selenium: 브라우저 실행, 페이지 이동, 렌더링 대기
+- CDP: Network 이벤트 확인과 Response Body 접근
 
-### Raw Data
+ATP에 직접 요청했을 때 `403`이 발생하는 문제가 있었기 때문에, 실제 브라우저 환경에서 데이터를 확인하는 방식으로 수집 구조를 변경했습니다.
 
-수집한 원본 데이터를 별도로 보존하여
-가공 과정에서 문제가 발생했을 때 원본을 다시 확인할 수 있도록 구성했습니다.
+### 2. Raw Data Storage
 
-### Processing
+수집한 원본 응답과 함께 다음 메타데이터를 보존합니다.
 
-서비스에서 사용할 수 있도록 수집 데이터를 정제하고 구조화합니다.
+- Source
+- Source URL
+- Source Player ID
+- Collection Time
+- Collection Method
+- Original JSON 또는 Content
 
-### AI
+원본 데이터를 별도로 보존하면 가공 결과에 문제가 생겼을 때 수집을 다시 실행하지 않고 원인을 확인하거나 재처리할 수 있습니다.
 
-선수 Biography의 영어 원문을 기반으로 한국어 번역을 수행합니다.
+### 3. Data Processing
 
-AI는 인터넷에서 임의로 선수 정보를 생성하는 방식이 아니라,
-SPORTORY가 수집한 데이터를 기반으로 필요한 가공에 사용합니다.
+외부 데이터의 필드와 서비스에서 사용하는 필드를 매핑하고, 날짜·국가·플레이 스타일 등의 값을 서비스 스키마에 맞게 정제합니다.
 
-### Database
+```text
+Raw Data → Field Mapping → Data Cleaning → Service Schema → PostgreSQL
+```
 
-가공된 데이터를 PostgreSQL에 저장합니다.
+### 4. Biography Translation
 
-### Backend
+AI는 선수 정보를 생성하는 용도가 아니라, SPORTORY가 수집한 Biography 영문 원문을 한국어로 번역하는 단계에만 사용합니다.
 
-FastAPI를 사용하여 데이터 조회 API를 제공합니다.
+- Gemini 3.1 Flash-Lite 사용
+- Personal·Career 섹션을 기준으로 번역
+- 기존 Biography가 변경된 경우에만 재번역
+- `item_order`, 번역 결과 개수, 누락 여부를 검증한 뒤 저장
 
-### Frontend
+Ranking, Match, Statistics처럼 구조화된 데이터는 일반 코드로 처리하고, 문장 형태의 Biography에만 AI 번역을 적용했습니다.
 
-Frontend에서 Backend API를 호출하여
-실제 DB 데이터를 사용자에게 제공합니다.
+### 5. Database and API
 
----
+정제된 데이터를 PostgreSQL에 저장하고, FastAPI REST API를 통해 프론트엔드에 제공합니다.
 
-## 4. Key Features
+```text
+PostgreSQL → FastAPI Response → React Frontend
+```
+
+동일한 레코드를 다시 수집할 때는 키를 기준으로 `INSERT` 또는 `UPDATE`하는 UPSERT 방식으로 중복 저장을 줄입니다.
+
+## Main Features
 
 ### Player
 
-- Player Profile
+- Profile
 - Player Image
 - Nationality
 - Birth Date
@@ -134,10 +163,11 @@ Frontend에서 Backend API를 호출하여
 - Ranking Points
 - Ranking History
 
-### Match
+### Matches
 
 - Player Matches
 - Match Information
+- Tournament Information
 
 ### Statistics
 
@@ -150,233 +180,88 @@ Frontend에서 Backend API를 호출하여
 - Original English Text
 - Korean Translation
 
----
+## Tech Stack
 
-## 5. Tech Stack
+| Area | Technologies |
+| --- | --- |
+| Data Collection | Python, Selenium, Chrome DevTools Protocol, Network Response Parsing |
+| Data Processing | Python |
+| Backend | FastAPI, Uvicorn |
+| Database | PostgreSQL, Supabase |
+| Frontend | React, Vite, JavaScript, CSS |
+| AI Translation | Gemini 3.1 Flash-Lite |
+| Deployment | Vercel, Render, Supabase |
+| Automation | Windows Task Scheduler |
 
-### Frontend
+## Architecture
 
-- React
-- Vite
-- JavaScript
-- CSS
+```text
+ATP Web Source
+      ↓ Selenium · CDP
+Crawler: Collection / Raw Data
+      ↓ Python Processing
+PostgreSQL / Supabase
+      ↓ REST API
+FastAPI Backend
+      ↓ HTTP Request
+React Frontend / Vercel
+```
 
-### Backend
-
-- Python
-- FastAPI
-- Uvicorn
-
-### Data Collection
-
-- Python
-- Browser Automation
-- HTML / Network Response Parsing
-
-### Database
-
-- PostgreSQL
-- Supabase
-
-### AI
-
-- Gemini
-- Biography Korean Translation
-
-### Deployment
-
-- Vercel — Frontend
-- Render — Backend
-- Supabase — Database
-
----
-
-## 6. Project Structure
+## Repository Structure
 
 ```text
 SPORTORY/
-│
 ├── backend/
 │   ├── main.py
 │   ├── database.py
 │   └── routers/
-│
 ├── crawler/
-│   ├── ...
+│   ├── data collection scripts
 │   └── translate_player_bio.py
-│
 ├── data/
 │   └── player_images/
-│
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   └── pages/
-│   └── ...
-│
+│   └── src/
+│       ├── components/
+│       └── pages/
 ├── docs/
-│
 ├── requirements.txt
-├── .gitignore
 └── README.md
 ```
 
----
+## API
 
-## 7. Database
-
-SPORTORY는 PostgreSQL을 사용합니다.
-
-주요 데이터 영역은 다음과 같습니다.
-
-- Players
-- Player Ranking History
-- Matches
-- Tournaments
-- Player Statistics
-- Player Bios
-- Player Images
-- Raw Data
-
-외부에서 수집한 원본 데이터와 서비스에서 사용하는 가공 데이터를 구분하여 관리합니다.
-
----
-
-## 8. Backend API
-
-FastAPI를 기반으로 REST API를 제공합니다.
-
-주요 API:
-
-```text
+```http
 GET /players
 GET /players/{player_id}
 GET /players/{player_id}/bio
 GET /players/{player_id}/rankings
 GET /players/{player_id}/stats
 GET /players/{player_id}/matches
+GET /images/{player_image}
 ```
 
-선수 이미지는 Static Resource로 제공합니다.
-
-```text
-/images/{player_image}
-```
-
----
-
-## 9. Frontend
-
-Frontend는 Backend API를 통해 SPORTORY DB의 데이터를 조회합니다.
-
-주요 페이지:
-
-```text
-Home
-  ↓
-Tennis
-  ↓
-Players
-  ↓
-Player Detail
-```
-
-Player Detail에서는 선수의 Profile, Ranking, Matches, Statistics, Biography를 확인할 수 있습니다.
-
----
-
-## 10. Deployment
-
-현재 서비스는 다음과 같이 배포되어 있습니다.
+## Deployment
 
 ```text
 GitHub
-   │
-   ├── Frontend
-   │       ↓
-   │    Vercel
-   │
-   └── Backend
-           ↓
-        Render
-           ↓
-       Supabase
+├── Frontend → Vercel
+└── Backend  → Render → Supabase PostgreSQL
 ```
 
-### Frontend
+- Frontend: Vercel
+- Backend: Render
+- Database: Supabase PostgreSQL
+- Collection Automation: Windows Task Scheduler
 
-Vercel을 통해 React/Vite Frontend를 배포합니다.
+## Current Scope
 
-### Backend
+현재 서비스는 테니스 종목의 Player, Ranking, Matches, Statistics, Biography를 제공하며, Biography는 한국어로도 확인할 수 있습니다.
 
-Render를 통해 FastAPI Backend를 배포합니다.
+## Project Goal
 
-### Database
+```text
+Sports Data → Story
+```
 
-Supabase PostgreSQL을 사용합니다.
-
----
-
-## 11. Current Status
-
-### Implemented
-
-- ATP 선수 데이터 수집
-- Raw Data 저장
-- 데이터 정제 및 구조화
-- Biography 데이터 처리
-- Biography 한국어 번역
-- PostgreSQL 저장
-- FastAPI API
-- React Frontend
-- Frontend / Backend 연결
-- Vercel Frontend 배포
-- Render Backend 배포
-- Supabase PostgreSQL 연결
-
-### Currently Available
-
-- Tennis
-- Player
-- Ranking
-- Matches
-- Statistics
-- Biography
-- Korean Translation
-
----
-
-## 12. Future Work
-
-SPORTORY는 Tennis를 첫 번째 스포츠로 구현하고 있으며,
-향후 다른 스포츠로 확장할 수 있는 방향을 고려하고 있습니다.
-
-향후 후보 기능:
-
-- Additional Sports
-- More Player Data
-- News / Interview
-- AI-based Player Analysis
-- Additional User Features
-
-현재 구현되지 않은 기능은 서비스에서 제공되는 기능으로 간주하지 않습니다.
-
----
-
-## 13. Project Goal
-
-SPORTORY의 핵심 목표는
-
-> **Sports Data → Story**
-
-입니다.
-
-외부 스포츠 데이터를 수집하고,
-원본을 보존하며,
-필요한 데이터를 가공하고,
-AI를 필요한 부분에 활용한 뒤,
-Database와 API를 통해 사용자에게 전달합니다.
-
-단순한 스포츠 데이터 조회를 넘어
-선수의 기록과 정보를 연결하여
-스포츠와 선수에 대한 이야기를 전달하는 서비스를 지향합니다.
+스포츠 데이터를 수집하고, 원본을 보존하며, 서비스에 필요한 형태로 가공하고, API와 웹 화면을 통해 선수의 기록과 이야기를 함께 전달하는 것이 SPORTORY의 목표입니다.
