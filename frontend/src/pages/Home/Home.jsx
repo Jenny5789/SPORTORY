@@ -78,34 +78,13 @@ function Home() {
 
         const playerList = await response.json()
 
-        const playersWithRanking = await Promise.all(
-          playerList.map(async (player) => {
-            try {
-              const rankingResponse = await fetch(
-                `${API_BASE}/players/${player.player_id}/rankings?limit=1`,
-              )
-
-              if (!rankingResponse.ok) {
-                return {
-                  ...player,
-                  ranking: null,
-                }
-              }
-
-              const rankings = await rankingResponse.json()
-
-              return {
-                ...player,
-                ranking: rankings?.[0] ?? null,
-              }
-            } catch {
-              return {
-                ...player,
-                ranking: null,
-              }
-            }
-          }),
-        )
+        const playersWithRanking = playerList.map((player) => ({
+          ...player,
+          ranking: {
+            singles_rank: player.singles_rank,
+            singles_points: player.singles_points,
+          },
+        }))
 
         setPlayers(playersWithRanking)
       } catch (error) {

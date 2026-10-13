@@ -26,12 +26,13 @@ def get_players():
                 p.height_cm,
                 p.play_hand,
                 pi.image_path,
-                r.singles_rank
+                r.singles_rank,
+                r.singles_points
             FROM players p
             LEFT JOIN player_images pi
                 ON p.player_id = pi.player_id
             LEFT JOIN LATERAL (
-                SELECT singles_rank
+                SELECT singles_rank, singles_points
                 FROM player_ranking_history
                 WHERE player_id = p.player_id
                 ORDER BY rank_date DESC
@@ -63,7 +64,9 @@ def get_players():
                 "birth_date": row[4],
                 "height_cm": row[5],
                 "play_hand": row[6],
-                "image_url": image_url
+                "image_url": image_url,
+                "singles_rank": row[8],
+                "singles_points": row[9]
             }
         )
 

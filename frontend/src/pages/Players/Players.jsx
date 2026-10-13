@@ -45,29 +45,13 @@ function Players() {
 
         const playerData = await response.json()
 
-        const rankingResults = await Promise.all(
-          playerData.map(async (player) => {
-            try {
-              const rankingResponse = await fetch(
-                `${API_BASE_URL}/players/${player.player_id}/rankings?limit=1`,
-              )
-
-              if (!rankingResponse.ok) {
-                return [player.player_id, null]
-              }
-
-              const rankingData =
-                await rankingResponse.json()
-
-              return [
-                player.player_id,
-                rankingData[0] || null,
-              ]
-            } catch {
-              return [player.player_id, null]
-            }
-          }),
-        )
+        const rankingResults = playerData.map((player) => [
+          player.player_id,
+          {
+            singles_rank: player.singles_rank,
+            singles_points: player.singles_points,
+          },
+        ])
 
         setPlayers(playerData)
         setRankings(
