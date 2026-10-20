@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 
 import Home from './pages/Home/Home'
 import Players from './pages/Players/Players'
@@ -22,12 +22,23 @@ function App() {
       <ScrollToTop />
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* 첫 접속 → Players */}
+        <Route
+          path="/"
+          element={<Navigate to="/tennis/players" replace />}
+        />
+
+        {/* 기존 Home 유지 */}
+        <Route path="/home" element={<Home />} />
+
+        {/* Tennis */}
         <Route path="/tennis/players" element={<Players />} />
         <Route
           path="/tennis/players/:playerId"
           element={<PlayerDetail />}
         />
+
+        {/* About */}
         <Route path="/about" element={<About />} />
       </Routes>
     </>

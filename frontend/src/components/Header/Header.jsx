@@ -9,12 +9,12 @@ function Header({ variant = 'default' }) {
 
   return (
     <header className={headerClassName}>
-      <Link to="/" className="site-wordmark">
+      <Link to="/home" className="site-wordmark">
         SPORT<span>ORY</span>
       </Link>
 
       <nav className="site-nav" aria-label="Main navigation">
-        <Link to="/">Home</Link>
+        <Link to="/home">Home</Link>
 
         <div className="site-nav-sports">
           <button type="button" className="site-nav-sports-trigger">
