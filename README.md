@@ -1,309 +1,169 @@
 # SPORTORY
 
-> 선수 기록과 Biography를 연결해 선수의 이야기를 제공하는 개인 프로젝트
+> **크롤링 기반 풀스택 웹서비스** — ATP 테니스 선수 데이터 수집부터 DB · API · 웹 화면 · 배포까지 1인 구축
 
-- 스포츠 데이터를 기반으로 한 테니스 선수 정보 서비스
-- 선수 기록, 순위, 경기, 통계, Biography 제공
-- Biography 한국어 번역 제공
-- 데이터 수집부터 웹 서비스까지 직접 구현
+**[서비스 바로가기](https://sportory.vercel.app/tennis/players)** · [데이터 파이프라인](#아키텍처) · [문제 해결](#문제-해결) · [실행 방법](#실행-방법)
 
-## Links
+<img src="docs/images/players.png" width="85%" alt="SPORTORY 선수 목록 화면" />
 
-- [SPORTORY 바로가기](https://sportory.vercel.app/)
-- [GitHub 저장소](https://github.com/Jenny5789/SPORTORY)
-
-## Screenshots
-
-### Home
-
-- SPORTORY 서비스 소개
-- 현재 제공 종목: Tennis
-
-<img src="docs/images/home.png" width="80%" alt="SPORTORY Home" />
-
-### Players
-
-- 선수 목록
-- 현재 순위 확인
-
-<img src="docs/images/players.png" width="80%" alt="SPORTORY Players" />
-
-### Player Profile and Story
-
-- 카드 앞면: 선수 프로필과 주요 기록
-- 카드 뒤집기: Biography Story 확인
-
-<img src="docs/images/profile.png" width="80%" alt="SPORTORY Player Profile" />
-
-### Random Biography Story
-
-- Personal·Career Biography 항목 중 3개 랜덤 표시
-- 같은 선수의 다양한 이야기 확인
-
-<table>
-  <tr>
-    <td><img src="docs/images/story-1.png" width="100%" alt="Random Biography Story 1" /></td>
-    <td><img src="docs/images/story-2.png" width="100%" alt="Random Biography Story 2" /></td>
-  </tr>
-</table>
-
-### Ranking
-
-- 현재 순위 확인
-- 순위 이력 확인
-
-<img src="docs/images/ranking.png" width="80%" alt="SPORTORY Ranking" />
-
-## Project Overview
-
-- 구현 종목: Tennis
-- 수집 데이터:
-  - 선수 기본 정보
-  - 선수 이미지
-  - ATP 단식 순위 및 순위 이력
-  - 선수 경기 및 대회 정보
-  - 선수 통계
-  - Biography 원문
-  - Biography 한국어 번역
-- 사용자 흐름:
-
-```text
-Home → Tennis → Players → Player Detail
-```
-
-- Player Detail 제공 정보:
-  - Profile
-  - Ranking
-  - Matches
-  - Statistics
-  - Biography
-
-## Project Purpose
-
-- 기록과 순위 중심의 스포츠 정보 확장
-- 선수 기록과 Biography 연결
-- 숫자만으로 알기 어려운 선수의 배경과 이야기 제공
-
-## Data Pipeline
-
-```text
-ATP Web Source
-      ↓
-Data Collection
-      ↓
-Raw Data Storage
-      ↓
-Data Processing
-      ↓
-Biography Translation
-      ↓
-PostgreSQL
-      ↓
-FastAPI
-      ↓
-React Frontend
-```
-
-### 1. Data Collection
-
-- ATP 페이지의 동적 데이터 수집
-- 데이터 제공 형태에 따른 수집 방식 분리
-- Profile, Ranking, Matches, Statistics, Image:
-  - Network Response 기반 수집
-- Biography:
-  - HTML의 Personal·Career 영역 수집
-- Selenium:
-  - 브라우저 실행
-  - 페이지 이동
-  - 렌더링 대기
-- CDP:
-  - Network 이벤트 확인
-  - Response Body 접근
-- 문제 해결:
-  - ATP 직접 요청 시 `403` 발생
-  - 실제 브라우저 환경 기반 수집으로 전환
-
-### 2. Raw Data Storage
-
-- 수집 원본 응답 보존
-- 함께 보존하는 메타데이터:
-  - Source
-  - Source URL
-  - Source Player ID
-  - Collection Time
-  - Collection Method
-  - Original JSON 또는 Content
-- 활용:
-  - 가공 결과 문제 확인
-  - 원본 기준 재처리
-  - 수집 재실행 없이 데이터 검증
-
-### 3. Data Processing
-
-- 외부 데이터 필드와 서비스 필드 매핑
-- 날짜·국가·플레이 스타일 값 정제
-- 서비스 스키마에 맞게 데이터 구조화
-
-```text
-Raw Data → Field Mapping → Data Cleaning → Service Schema → PostgreSQL
-```
-
-### 4. Biography Translation
-
-- 사용 모델: Gemini 3.1 Flash-Lite
-- 대상: SPORTORY가 수집한 Biography 영문 원문
-- 번역 범위: Personal·Career
-- 기존 Biography 변경 시에만 재번역
-- 검증 항목:
-  - `item_order`
-  - 번역 결과 개수
-  - 누락 여부
-- 구조화 데이터는 일반 코드로 처리:
-  - Ranking
-  - Match
-  - Statistics
-
-### 5. Database and API
-
-- 정제 데이터: PostgreSQL 저장
-- 데이터 제공: FastAPI REST API
-- 프론트엔드 연결: React
-- 중복 저장 방지:
-  - 키 기준 `INSERT`
-  - 기존 데이터 기준 `UPDATE`
-  - UPSERT 방식 적용
-
-```text
-PostgreSQL → FastAPI Response → React Frontend
-```
-
-## Main Features
-
-### Player
-
-- Profile
-- Player Image
-- Nationality
-- Birth Date
-- Height
-- Playing Hand
-
-### Ranking
-
-- ATP Singles Ranking
-- Ranking Points
-- Ranking History
-
-### Matches
-
-- Player Matches
-- Match Information
-- Tournament Information
-
-### Statistics
-
-- Player Statistics
-
-### Biography
-
-- Personal Information
-- Career Information
-- Original English Text
-- Korean Translation
-
-## Tech Stack
-
-| Area | Technologies |
+| 구분 | 내용 |
 | --- | --- |
-| Data Collection | Python, Selenium, Chrome DevTools Protocol, Network Response Parsing |
-| Data Processing | Python |
-| Backend | FastAPI, Uvicorn |
-| Database | PostgreSQL, Supabase |
-| Frontend | React, Vite, JavaScript, CSS |
-| AI Translation | Gemini 3.1 Flash-Lite |
-| Deployment | Vercel, Render, Supabase |
-| Automation | Windows Task Scheduler |
+| 유형 | 개인 프로젝트 |
+| 기간 | 2026.09 – 2026.10 (1개월) |
+| 수행 범위 | 기획 · 데이터 수집 · DB 설계 · 백엔드 · 프론트엔드 · 배포 · 자동화 |
+| 데이터 출처 | [ATP](https://www.atptour.com) (Association of Tennis Professionals · 남자 프로 테니스 투어 운영 단체) 공식 웹사이트 |
 
-## Architecture
+## 기획 의도
 
-```text
-ATP Web Source
-      ↓ Selenium · CDP
-Crawler: Collection / Raw Data
-      ↓ Python Processing
-PostgreSQL / Supabase
-      ↓ REST API
-FastAPI Backend
-      ↓ HTTP Request
-React Frontend / Vercel
+- 선수 기록 · 경기 정보 → 제공 채널 다수
+- 선수 개인 정보 · 이야기 → 제공 채널 부족
+- → 선수 기록과 Biography(이야기)를 한 곳에서 보는 서비스
+
+## 아키텍처
+
+<img src="docs/images/architecture.png" width="100%" alt="SPORTORY 아키텍처: ATP 웹사이트 → 데이터 수집 → 처리 · 번역 → DB 저장 → API 서버 → 웹 화면" />
+
+## 기술 스택 · 사용 용도
+
+| 구분 | 기술 | 사용 용도 |
+| --- | --- | --- |
+| 데이터 수집 | Python · Selenium · CDP | 403 차단 → 브라우저 실행 · Network Response(JSON) · HTML 수집 |
+| 데이터 처리 | Python | Raw 원본 보존 · 필드 매핑 · 정제 · 구조화 |
+| 번역 | Gemini API (3.1 Flash-Lite) | Biography 영문 → 한글 번역 · 변경 시에만 실행 |
+| DB | PostgreSQL · Supabase | 정제 데이터 저장 · UPSERT로 중복 저장 방지 |
+| 백엔드 | FastAPI · Render | DB 조회 API · JSON 응답 · 서버 배포 |
+| 프론트엔드 | React · Vite · Vercel | 선수 목록 · 카드 · 상세 화면 · 배포 |
+| 자동화 | Windows 작업 스케줄러 | 데이터별 수집 주기 자동 실행 |
+
+## 핵심 구현
+
+### 1. 데이터 위치별 수집 방식 분리
+
+| 데이터 | 수집 방식 | 수집 주기 | 코드 |
+| --- | --- | --- | --- |
+| Profile | Network Response (JSON) | 월 1회 | [collect_player_overview.py](crawler/collect_player_overview.py) |
+| Ranking | Network Response (JSON) | 주 2회 | [collect_player_ranking_history.py](crawler/collect_player_ranking_history.py) |
+| Matches | Network Response (JSON) | 주 2회 | [collect_player_activity.py](crawler/collect_player_activity.py) |
+| Statistics | Network Response (JSON) | 주 2회 | [collect_player_stats.py](crawler/collect_player_stats.py) |
+| Image | Network Response (PNG) | 월 1회 | [collect_player_image.py](crawler/collect_player_image.py) |
+| Biography | HTML 요소 | 월 1회 | [collect_player_bio.py](crawler/collect_player_bio.py) |
+
+- 개발자 도구로 화면 데이터의 위치 확인 → API 응답은 CDP로 Response Body 수집, 응답에 없는 Biography는 HTML에서 추출
+- 변경 빈도별 수집 주기 차등 → 불필요한 반복 수집 방지
+
+### 2. Raw 원본 보존 → 재수집 없이 재처리
+
+- 수집 응답을 `raw_data` 테이블에 원본 그대로 저장
+- 함께 기록: 출처 · URL · 선수 ID · 수집 시각 · 수집 방식
+- 정제 로직 변경 · 오류 확인 시 원본 기준 재처리
+- 코드: [save_raw_to_db.py](crawler/save_raw_to_db.py)
+
+### 3. 정제 · 구조화 · UPSERT
+
+- 외부 필드 → 서비스 스키마 매핑 (예: 생년월일 시각 제거, 중첩 객체 → 단일 값)
+- 키 기준 `INSERT ... ON CONFLICT` → 재수집 시 중복 없이 갱신
+- 코드: [save_player_to_db.py](crawler/save_player_to_db.py) · [save_matches_to_db.py](crawler/save_matches_to_db.py)
+
+### 4. LLM 번역 · 결과 검증
+
+- 기존 DB Bio와 새 Raw Bio 비교 → 변경된 경우에만 번역 ([check_bio_changed.py](crawler/check_bio_changed.py))
+- Personal · Career 섹션 단위 일괄 번역, JSON 응답 스키마 지정 ([translate_player_bio.py](crawler/translate_player_bio.py))
+- 검증: `item_order` 기준 원문 ↔ 번역 재연결 · 원문 · 번역 개수 일치 · 누락 확인
+
+### 5. API
+
+| Method | Endpoint | 설명 |
+| --- | --- | --- |
+| GET | `/players` | 선수 목록 + 최신 순위 · 점수 |
+| GET | `/players/{player_id}` | 선수 상세 정보 · 이미지 URL |
+| GET | `/players/{player_id}/bio` | Biography (영문 · 한글) |
+| GET | `/players/{player_id}/rankings` | 순위 이력 |
+| GET | `/players/{player_id}/stats` | 통계 |
+| GET | `/players/{player_id}/matches` | 경기 · 대회 정보 |
+
+- 코드: [backend/routers/players.py](backend/routers/players.py)
+
+### 6. DB 테이블
+
+| 테이블 | 역할 |
+| --- | --- |
+| `raw_data` | 수집 원본 · 수집 정보 |
+| `players` | 선수 기본 정보 |
+| `player_images` | 선수 이미지 경로 |
+| `player_ranking_history` | 순위 · 점수 이력 |
+| `player_stats` | 선수 통계 |
+| `matches` · `tournaments` | 경기 · 대회 정보 |
+| `player_bios` | Biography 원문 · 번역 |
+
+## 문제 해결
+
+| 문제 | 해결 |
+| --- | --- |
+| `requests`로 ATP 요청 시 `403 Forbidden` | Selenium 브라우저 실행 + CDP Network Response 수집으로 전환 |
+| GitHub Actions에서 Stats 응답 수집 실패 → Python `schedule`은 스크립트 상시 실행 필요 | Windows 작업 스케줄러로 전환 |
+| 재수집할 때마다 같은 Bio 반복 번역 | 기존 Bio와 비교 → 변경된 경우에만 Gemini 번역 |
+| 선수 목록 조회 후 선수마다 `/rankings` 추가 요청 | `/players` 응답에 최신 ranking · points 포함 → 추가 호출 제거 ([커밋](https://github.com/Jenny5789/SPORTORY/commit/2566428)) |
+
+## 화면
+
+| 선수 카드 (앞면 · 뒷면) | 순위 이력 |
+| --- | --- |
+| <img src="docs/images/profile.png" width="100%" alt="선수 카드" /> | <img src="docs/images/ranking.png" width="100%" alt="순위 이력" /> |
+
+| Biography Story | Biography Story |
+| --- | --- |
+| <img src="docs/images/story-1.png" width="100%" alt="Biography Story 1" /> | <img src="docs/images/story-2.png" width="100%" alt="Biography Story 2" /> |
+
+## 실행 방법
+
+**환경 변수** (`.env`, 저장소 미포함)
+
+```env
+DB_HOST=
+DB_PORT=
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+GEMINI_API_KEY=
 ```
 
-## Repository Structure
+**백엔드**
+
+```bash
+pip install -r requirements.txt
+uvicorn backend.main:app --reload
+```
+
+**프론트엔드** (`VITE_API_BASE_URL` 미설정 시 `http://127.0.0.1:8000`)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+**데이터 수집**
+
+```bash
+python crawler/get_players_from_db.py      # 주 2회: Ranking · Matches · Statistics
+python crawler/run_monthly_player_data.py  # 월 1회: Profile · Bio · Image
+```
+
+## 폴더 구조
 
 ```text
 SPORTORY/
-├── backend/
-│   ├── main.py
-│   ├── database.py
-│   └── routers/
-├── crawler/
-│   ├── data collection scripts
-│   └── translate_player_bio.py
-├── data/
-│   └── player_images/
-├── frontend/
-│   └── src/
-│       ├── components/
-│       └── pages/
-├── docs/
-├── requirements.txt
-└── README.md
+├── crawler/            # 수집 · Raw 저장 · 정제 · 번역 스크립트
+│   └── experiments/    # 수집 방식 검증용 테스트 코드
+├── backend/            # FastAPI (main.py · routers/)
+├── frontend/           # React · Vite
+├── docs/               # 자동화 · 선수 추가 가이드, 화면 캡처
+└── requirements.txt
 ```
 
-## API
+## 회고 · 배운 점
 
-```http
-GET /players
-GET /players/{player_id}
-GET /players/{player_id}/bio
-GET /players/{player_id}/rankings
-GET /players/{player_id}/stats
-GET /players/{player_id}/matches
-GET /images/{player_image}
-```
-
-## Deployment
-
-```text
-GitHub
-├── Frontend → Vercel
-└── Backend  → Render → Supabase PostgreSQL
-```
-
-- Frontend: Vercel
-- Backend: Render
-- Database: Supabase PostgreSQL
-- Collection Automation: Windows Task Scheduler
-
-## Current Scope
-
-- 현재 서비스 종목: Tennis
-- 현재 제공 기능:
-  - Player
-  - Ranking
-  - Matches
-  - Statistics
-  - Biography
-  - Biography 한국어 번역
-
-## Project Goal
-
-```text
-Sports Data → Story
-```
-
-- 스포츠 데이터 수집
-- 원본 데이터 보존
-- 서비스용 데이터 가공
-- API와 웹 화면 연결
-- 선수 기록과 이야기 제공
+- **브라우저 기반 데이터 수집**: 접근 차단 원인 확인 → 수집 방식 전환, 데이터 위치(JSON · HTML)별 수집 방식 설계
+- **데이터 파이프라인 설계**: 원본 보존 · 정제 단계 분리 → 재처리 가능한 구조
+- **LLM API 활용**: 응답 스키마 지정 · 결과 검증 · 변경 감지로 호출 최소화
+- **풀스택 · 배포 · 운영**: FastAPI · React 연동, API 응답 구조 개선, Render · Vercel · Supabase 배포, 수집 자동화
