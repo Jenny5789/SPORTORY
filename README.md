@@ -11,7 +11,7 @@ Selenium · CDP로 ATP 선수 데이터를 수집해 DB · API · 웹 화면 · 
 ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Gemini](https://img.shields.io/badge/Gemini_API-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)
 
-<img src="docs/images/player_cards.png" width="480" alt="수집한 ATP 선수 카드 목록">
+<img src="docs/images/player_cards.jpg" width="480" alt="수집한 ATP 선수 카드 목록">
 
 ## 한눈에 보기
 
