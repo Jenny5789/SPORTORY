@@ -13,12 +13,26 @@ Selenium · CDP로 ATP 선수 데이터를 수집해 DB · API · 웹 화면 · 
 
 <img src="docs/images/player_cards.jpg" width="480" alt="수집한 ATP 선수 카드 목록">
 
+## 개요
+
+- **문제**
+  - 경기 일정 · 순위: 여러 사이트에서 쉽게 확인 가능
+  - 선수 Biography: 분산되어 한눈에 모아보기 어려움
+- **해결**
+  - 스크래핑으로 필요한 정보를 수집해 한 곳에서 제공하는 웹 서비스 구현
+  - 브라우저가 받는 JSON 응답 수집 → 원본 DB 저장 → 정제
+  - Biography: 원문 변경 시에만 한국어 번역
+- **결과**
+  - 경기 일정 · 순위 · Biography를 한 곳에서 조회
+  - 선수 목록 요청 N+1회 → 1회로 단축
+  - 선수 20명 데이터 운영 중
+
 ## 한눈에 보기
 
 | 항목 | 내용 |
 |---|---|
 | 역할 | 1인 · 기획, 데이터 수집, DB 설계, 백엔드, 프론트엔드, 배포, 자동화 |
-| 기간 | 2026.09 – 2026.10 |
+| 기간 | 2026.09 – 2026.10 (3주) |
 | 규모 | 선수 20명 · DB 테이블 8개 · REST API 6개 |
 | 배포 | DB Supabase · API Render · 웹 Vercel |
 
@@ -37,47 +51,46 @@ Selenium · CDP로 ATP 선수 데이터를 수집해 DB · API · 웹 화면 · 
 
 ## 설계 의도
 
-### 1. 수집: 화면 HTML 대신 API 응답(JSON)
+5개 핵심 결정을 **문제 → 방법** 순으로 정리
 
-- **배경**: `requests` 요청은 `403 Forbidden`으로 차단. 화면 HTML은 레이아웃 변경에 취약
-- **결정**: Selenium으로 브라우저 실행, CDP Network 로그에서 페이지가 받는 API 응답(JSON) 추출. JSON에 없는 Biography만 HTML 파싱
-- **검토한 대안**
-  - `requests` 직접 호출 → 403 차단으로 기각 ([test_atp_request.py](crawler/test_atp_request.py))
-  - Playwright · Selenium HTML 파싱 → 선택자 의존도가 높아 유지보수 부담으로 기각 ([test_atp_playwright.py](crawler/test_atp_playwright.py) · [experiments/](crawler/experiments/))
-- **트레이드오프**: 브라우저 실행 비용(속도 · 메모리) 증가 → 데이터별 수집 주기 차등으로 실행 횟수 최소화
+### 1. 수집: 화면 HTML 대신 JSON 응답 수집
 
-### 2. 저장: Raw 적재와 정제 데이터 분리
+- **문제**
+  - `requests` 요청 시 `403 Forbidden` 차단
+  - 화면 HTML 파싱은 레이아웃 변경에 취약
+- **방법**
+  - Selenium 실행 → CDP 네트워크 로그에서 JSON 응답 추출
+  - JSON에 없는 Biography만 HTML 파싱
+- **결과**: 프로필 · 순위 · 경기 · 통계 · 이미지 5종을 JSON으로 수집
 
-- **배경**: 외부 데이터 구조나 정제 규칙이 바뀌면 다시 수집해야 하는 문제
-- **결정**: 수집 응답을 `raw_data`에 원본 그대로 적재(출처 · URL · 선수 ID · 수집 시각 · 수집 방식 포함) 후 정제
-- **검토한 대안**: 수집 즉시 정제 후 저장 → 원본이 남지 않아 재처리 불가로 기각
-- **트레이드오프**: 저장 용량과 테이블 1개 추가
+### 2. 저장: 원본 우선 적재, 정제는 후속 처리
 
-### 3. 갱신: 데이터별 갱신 주기 기반 수집 + UPSERT
+- **문제**: 수집 즉시 정제하면 정제 규칙 변경 시 재수집 필요
+- **방법**: `raw_data`에 출처 · URL · 선수 ID · 수집 시각과 함께 원본 적재 후 정제
+- **결과**: 정제 규칙이 바뀌어도 재수집 없이 원본으로 재처리 가능
 
-- **배경**: 데이터 종류마다 원천의 갱신 주기가 다름. 순위는 주 단위 발표, 경기 · 통계는 대회 진행에 따라 변경, 프로필 · 이미지 · Biography는 변경 빈도가 낮음
-- **결정**: 변경 빈도에 맞춰 수집 주기 차등(순위 · 경기 · 통계 주 2회, 프로필 · 이미지 · Biography 월 1회). 키 기준 `INSERT ... ON CONFLICT DO UPDATE`로 멱등 갱신
-- **검토한 대안**
-  - 전 데이터 동일 주기 수집 → 불필요한 브라우저 실행 · 쓰기 증가로 기각
-  - 전체 삭제 후 재적재 → 적재 중 데이터 공백 발생으로 기각
-- **트레이드오프**: 데이터 종류별 스케줄 관리 필요
+### 3. 갱신: 데이터별 주기 수집 + UPSERT
 
-### 4. 번역: 변경 감지 + Structured Output + 응답 검증
+- **문제**: 데이터마다 갱신 주기가 다름 (순위 주 단위, 프로필 · Biography 변경 빈도 낮음)
+- **방법**
+  - 순위 · 경기 · 통계: 주 2회 / 프로필 · 이미지 · Biography: 월 1회
+  - 키 기준 UPSERT(있으면 갱신, 없으면 추가) → 재실행해도 결과 동일
+- **결과**: 순위 · 경기 · 통계 주 2회, 프로필 · Biography 월 1회 자동 수집 운영
 
-- **배경**: 월 1회 Biography 재수집 시 변경 없는 원문까지 반복 번역 → 불필요한 API 비용
-- **결정**
-  - 기존 DB 원문과 신규 원문을 섹션별 비교, 변경 시에만 Gemini 호출
-  - JSON Schema(`item_order`, `translated_text`)로 응답 형식 고정
-  - 원문 · 번역 개수 검증, `item_order` 기준 재매핑으로 누락 · 순서 오류 방지
-- **검토한 대안**: 매 수집마다 전체 번역 → 비용 증가와 번역 결과 흔들림으로 기각
-- **트레이드오프**: 비교 · 검증 로직 추가
+### 4. 번역: 변경 감지 + 구조화 응답 + 검증
+
+- **문제**: 월 1회 재수집 시 변경 없는 원문도 반복 번역 → API 비용 낭비
+- **방법**
+  - 기존 · 신규 원문 섹션별 비교 → 변경 시에만 Gemini 호출
+  - JSON Schema로 응답 형식 고정
+  - 원문 · 번역 개수 검증, `item_order`로 순서 재매핑
+- **결과**: 변경 없는 선수는 Gemini 호출 생략
 
 ### 5. API: 화면 단위 응답 설계
 
-- **배경**: 선수 목록 조회 후 선수마다 순위를 다시 요청하는 N+1 요청 구조
-- **결정**: `/players` 응답에 최신 순위 · 점수 포함
-- **검토한 대안**: 프론트엔드 병렬 요청(`Promise.all`) 유지 → 요청 수 자체는 줄지 않아 기각
-- **트레이드오프**: 목록 응답 크기 소폭 증가
+- **문제**: 목록 조회 후 선수마다 순위를 재요청 (N+1 요청)
+- **방법**: `/players` 응답에 최신 순위 · 점수 포함
+- **결과**: 목록 화면 요청 N+1회 → 1회
 
 ## 진행 과정
 
@@ -88,7 +101,7 @@ Selenium · CDP로 ATP 선수 데이터를 수집해 DB · API · 웹 화면 · 
 | 3. API 개발 | FastAPI REST API 6개 | 화면별 필요 응답 구조 정의 |
 | 4. 프론트엔드 | React 선수 목록 · 카드 · 상세 화면 | API 연동, 카드 앞뒤 · Biography Story |
 | 5. 배포 | Supabase · Render · Vercel, CORS 설정 | 배포 환경 화면 · API 연결 |
-| 6. 자동화 | GitHub Actions 시도 → Windows 작업 스케줄러 | 주 2회 · 월 1회 자동 수집 |
+| 6. 자동화 | Windows 작업 스케줄러 | 주 2회 · 월 1회 자동 수집 |
 | 7. 개선 | N+1 요청 제거, SPA 라우팅 설정 | 목록 화면 요청 1회로 감소 |
 
 ## 핵심 코드
@@ -191,7 +204,7 @@ translated_by_order = {                                      # item_order 기준
 
 ## 결과 화면
 
-| 선수 카드 (앞면 · 뒷면) | 순위 이력 |
+| 선수 카드 (앞면) | 순위 이력 |
 |---|---|
 | <img src="docs/images/profile.png" width="280" alt="선수 카드"> | <img src="docs/images/ranking.png" width="280" alt="순위 이력"> |
 
@@ -207,11 +220,24 @@ translated_by_order = {                                      # item_order 기준
 - **수집 대상 확장**: 선수 추가 절차는 [ADD_PLAYER_GUIDE.md](docs/ADD_PLAYER_GUIDE.md)로 정리, 대상 확대 시 수집 시간 증가 대응 필요
 - **테스트 부재**: 정제 · 매핑 함수 단위 테스트로 외부 스키마 변경 조기 감지 필요
 
+## 기술 스택
+
+| 영역 | 기술 |
+|---|---|
+| 언어 | Python, JavaScript(JSX), HTML, CSS |
+| 수집 | Selenium, Chrome DevTools Protocol(CDP) Network 로그 |
+| 번역 | Google Gemini API (`google-genai`, Structured Output) |
+| DB · 스토리지 | PostgreSQL, Supabase(Storage 포함), psycopg |
+| 백엔드 | FastAPI, Uvicorn |
+| 프론트엔드 | React 19, Vite 8, React Router 7, CSS(컴포넌트별 파일) |
+| 자동화 | Windows 작업 스케줄러 |
+| 배포 | Supabase · Render(API) · Vercel(웹) |
+
 ## 배운 점
 
 - 수집 방식을 바꾸기 전에 응답을 직접 확인해 원인부터 특정하는 접근
-- Raw 적재 · 정제 분리처럼 재처리 가능한 구조를 먼저 설계하는 것의 가치
-- LLM 출력은 스키마 고정과 검증을 거쳐야 서비스 데이터로 쓸 수 있다는 점
+- 원본 저장과 정제를 분리해 재처리 가능한 구조를 먼저 설계하는 것의 가치
+- AI 번역 결과는 응답 형식 고정과 검증을 거쳐야 서비스 데이터로 쓸 수 있다는 점
 
 <details>
 <summary><b>API · DB 테이블</b></summary>
