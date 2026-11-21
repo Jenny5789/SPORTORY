@@ -1,3 +1,5 @@
+// 순위 이력 SVG 꺾은선 차트 (차트 라이브러리 없이 직접 좌표 계산)
+// data: 날짜 오름차순 이력, valueKey: 표시할 값 필드, type: 'rank' | 'points'
 function RankingChart({ data, valueKey, type = 'points' }) {
   if (data.length === 0) return null
 
@@ -8,13 +10,17 @@ function RankingChart({ data, valueKey, type = 'points' }) {
   const values = data.map((item) => item[valueKey])
   const minValue = Math.min(...values)
   const maxValue = Math.max(...values)
+  // 모든 값이 같으면 범위 0, 0 나눗셈 방지용 1 사용
   const valueRange = maxValue - minValue || 1
 
+  // 인덱스 기준 균등 가로 배치, 데이터 1건이면 가운데
   const getX = (index) => {
     if (data.length === 1) return width / 2
     return paddingX + (index / (data.length - 1)) * (width - paddingX * 2)
   }
 
+  // 최솟값~최댓값을 차트 높이로 정규화 (SVG y축은 아래로 증가)
+  // rank: 작은 값(상위 순위)을 위쪽, points: 큰 값을 위쪽에 배치
   const getY = (value) => {
     const normalized = (value - minValue) / valueRange
     const chartHeight = height - paddingY * 2
@@ -27,6 +33,7 @@ function RankingChart({ data, valueKey, type = 'points' }) {
     .map((item, index) => `${getX(index)},${getY(item[valueKey])}`)
     .join(' ')
 
+  // 7건 이상이면 처음, 마지막, 짝수 인덱스 날짜만 표시
   const shouldShowDate = (index) => {
     if (data.length <= 6) return true
     return index === 0 || index === data.length - 1 || index % 2 === 0
@@ -63,6 +70,7 @@ function RankingChart({ data, valueKey, type = 'points' }) {
         })}
       </svg>
 
+      {/* 날짜 라벨: 'YYYY-MM-DD' → 'MM/DD' */}
       <div
         className="ranking-chart-dates"
         style={{ gridTemplateColumns: `repeat(${data.length}, 1fr)` }}

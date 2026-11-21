@@ -1,6 +1,4 @@
-/* =========================================================
-   PROFILE
-   ========================================================= */
+/* PROFILE */
 .player-profile {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
@@ -137,9 +135,7 @@
   font-size: 14px;
 }
 
-/* =========================================================
-   PROFILE MOBILE
-   ========================================================= */
+/* PROFILE MOBILE */
 @media (max-width: 760px) {
   .player-profile {
     grid-template-columns: 1fr;

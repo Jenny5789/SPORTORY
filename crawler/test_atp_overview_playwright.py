@@ -1,3 +1,8 @@
+"""Playwright로 ATP 선수 Overview 페이지 프로필 항목 추출 실험.
+
+이름, 국적, 나이, 몸무게, 키, 프로 전향 연도, 출생지, 플레이, 코치를 HTML 요소에서 추출.
+"""
+
 from playwright.sync_api import sync_playwright
 
 

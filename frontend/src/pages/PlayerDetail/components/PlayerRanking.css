@@ -1,6 +1,4 @@
-/* =========================================================
-   RANKING
-   ========================================================= */
+/* RANKING */
 .player-ranking {
   padding: clamp(72px, 9vw, 120px) 0;
   border-top: 1px solid var(--hair);
@@ -79,9 +77,7 @@
   letter-spacing: 0.12em;
 }
 
-/* =========================================================
-   RANKING HISTORY
-   ========================================================= */
+/* RANKING HISTORY */
 .ranking-history {
   padding-top: clamp(72px, 9vw, 112px);
 }

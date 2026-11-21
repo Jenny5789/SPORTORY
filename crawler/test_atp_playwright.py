@@ -1,3 +1,8 @@
+"""Playwright로 ATP 단식 랭킹 페이지 접속 실험.
+
+상위 50개 행의 순위, 이름, 포인트, 상세 페이지 링크 추출.
+"""
+
 from playwright.sync_api import sync_playwright
 
 

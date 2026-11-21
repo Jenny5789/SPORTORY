@@ -1,3 +1,9 @@
+"""ATP 선수 통계(Player Stats) API 응답 수집.
+
+입력: player_id → 출력: data/raw/{player_id}_stats_response.json (/stats/{player_id}/all/all 응답 원본)
+실행: python crawler/collect_player_stats.py
+"""
+
 import base64
 import json
 import os
@@ -8,6 +14,7 @@ from selenium.webdriver.chrome.options import Options
 
 
 def collect_player_stats(player_id):
+    """Player Stats 페이지 접속 후 CDP Network 로그에서 통계 API 응답을 찾아 JSON 파일로 저장."""
     player_id = player_id.strip().lower()
 
     stats_page_url = (
@@ -21,6 +28,7 @@ def collect_player_stats(player_id):
 
     options = Options()
 
+    # performance 로그 활성화 (Network 이벤트 기록)
     options.set_capability(
         "goog:loggingPrefs",
         {"performance": "ALL"}
@@ -40,6 +48,7 @@ def collect_player_stats(player_id):
 
         driver.get(stats_page_url)
 
+        # 페이지 내 API 요청 완료 대기
         time.sleep(5)
 
         performance_logs = driver.get_log("performance")
@@ -50,6 +59,7 @@ def collect_player_stats(player_id):
         for log in performance_logs:
             message = json.loads(log["message"])["message"]
 
+            # 응답 수신 이벤트만 처리
             if message["method"] != "Network.responseReceived":
                 continue
 
@@ -60,6 +70,7 @@ def collect_player_stats(player_id):
 
             print(f"Response URL: {response_url}")
 
+            # 통계 API 응답만 필터링
             if target_pattern not in response_url:
                 continue
 
@@ -71,6 +82,7 @@ def collect_player_stats(player_id):
             request_id = params["requestId"]
 
             try:
+                # requestId로 응답 본문 조회
                 body_result = driver.execute_cdp_cmd(
                     "Network.getResponseBody",
                     {"requestId": request_id}
@@ -78,6 +90,7 @@ def collect_player_stats(player_id):
 
                 body = body_result["body"]
 
+                # base64 인코딩 응답은 디코딩 후 파싱
                 if body_result.get("base64Encoded"):
                     body = base64.b64decode(body).decode("utf-8")
 
@@ -86,6 +99,7 @@ def collect_player_stats(player_id):
 
                 break
 
+            # 본문 조회 실패 시 다음 응답 확인
             except Exception as error:
                 print(f"응답 Body 읽기 실패: {error}")
 
@@ -94,6 +108,7 @@ def collect_player_stats(player_id):
                 "Stats 응답을 찾지 못했습니다."
             )
 
+        # 응답 구조 검증 (필수 필드, 요청 선수와 일치 여부)
         if "Stats" not in stats_data:
             raise RuntimeError(
                 "Stats 응답에 Stats 필드가 없습니다."

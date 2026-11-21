@@ -1,3 +1,10 @@
+/*
+ * Home 화면 (/home)
+ * - 히어로: 서비스 소개, 단식 순위 순 선수 슬라이더 (5초 자동 전환)
+ * - Explore Sports: 종목 타일 목록 (Tennis만 선수 목록으로 이동)
+ * - 선수 클릭 시 PlayerQuickProfile 팝업
+ * - API: GET /players
+ */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -13,8 +20,10 @@ import baseballImg from '../../assets/home/sport_baseball.png'
 import cyclingImg from '../../assets/home/sport_cycling.png'
 import runningImg from '../../assets/home/sport_running.png'
 
+// 배포 환경은 VITE_API_BASE_URL 사용, 미설정 시 로컬 FastAPI 서버
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+// 선수 슬라이더 자동 전환 간격 (ms)
 const PLAYER_INTERVAL = 5000
 
 function Home() {
@@ -24,6 +33,7 @@ function Home() {
   const [playerIndex, setPlayerIndex] = useState(0)
   const [selectedPlayer, setSelectedPlayer] = useState(null)
 
+  // 종목 타일 데이터, available: false 종목은 링크 없이 Planned 표시
   const sports = [
     {
       name: 'Tennis',
@@ -63,10 +73,9 @@ function Home() {
     },
   ]
 
-  /* =========================================================
-     PLAYER DATA
-  ========================================================= */
+  /* PLAYER DATA */
 
+  // 마운트 시 1회 선수 목록 조회
   useEffect(() => {
     const loadPlayers = async () => {
       try {
@@ -78,6 +87,7 @@ function Home() {
 
         const playerList = await response.json()
 
+        // PlayerQuickProfile의 ranking prop 형태({ singles_rank, singles_points })로 변환
         const playersWithRanking = playerList.map((player) => ({
           ...player,
           ranking: {
@@ -88,6 +98,7 @@ function Home() {
 
         setPlayers(playersWithRanking)
       } catch (error) {
+        // 실패 시 콘솔 기록, 히어로 영역은 LOADING TENNIS 문구 유지
         console.error('Failed to load players:', error)
       }
     }
@@ -95,6 +106,7 @@ function Home() {
     loadPlayers()
   }, [])
 
+  // 단식 순위 있는 선수만 순위 오름차순 정렬 (슬라이더 순서)
   const rankedPlayers = useMemo(() => {
     return [...players]
       .filter((player) => player.ranking?.singles_rank)
@@ -106,10 +118,9 @@ function Home() {
 
   const activePlayer = rankedPlayers[playerIndex]
 
-  /* =========================================================
-     PLAYER SLIDER
-  ========================================================= */
+  /* PLAYER SLIDER */
 
+  // 선수 2명 이상, 팝업 닫힌 상태에서만 자동 전환 (팝업 열림 시 정지)
   useEffect(() => {
       if (
       rankedPlayers.length <= 1 ||
@@ -124,9 +135,11 @@ function Home() {
       )
     }, PLAYER_INTERVAL)
 
+    // 의존 값 변경, 언마운트 시 타이머 해제
     return () => window.clearInterval(timer)
   }, [rankedPlayers.length, selectedPlayer])
     
+  // 이전, 다음 버튼: 첫 선수와 마지막 선수 사이 순환
   const showPreviousPlayer = () => {
     if (!rankedPlayers.length) return
 
@@ -145,10 +158,9 @@ function Home() {
     )
   }
 
-  /* =========================================================
-     HOME CONTROLS
-  ========================================================= */
+  /* HOME CONTROLS */
 
+  // 종목 타일 레일 가로 스크롤 (direction: -1 왼쪽, 1 오른쪽)
   const scrollRail = (direction) => {
     railRef.current?.scrollBy({
       left: direction * 380,
@@ -156,6 +168,7 @@ function Home() {
     })
   }
 
+  // EXPLORE SPORTS 버튼 클릭 시 종목 섹션으로 이동
   const scrollToSports = () => {
     document
       .getElementById('explore-sports')
@@ -168,13 +181,11 @@ function Home() {
     <div className="home-page">
       <Header variant="overlay" />
 
-      {/* =====================================================
-          HERO
-      ===================================================== */}
+      {/* HERO */}
 
       <section className="hero">
 
-        {/* LEFT — SPORTORY */}
+        {/* LEFT: SPORTORY */}
 
         <div className="hero-brand">
           <img
@@ -223,7 +234,7 @@ function Home() {
           </div>
         </div>
 
-        {/* RIGHT — CURRENTLY AVAILABLE SPORT */}
+        {/* RIGHT: CURRENTLY AVAILABLE SPORT */}
 
         <div className="hero-available">
           {activePlayer ? (
@@ -373,9 +384,7 @@ function Home() {
         </div>
       </section>
 
-      {/* =====================================================
-          EXPLORE SPORTS
-      ===================================================== */}
+      {/* EXPLORE SPORTS */}
 
       <section
         className="explore"
@@ -460,6 +469,7 @@ function Home() {
               </>
             )
 
+            // available 종목만 선수 목록 링크, 나머지는 클릭 불가 타일
             if (sport.available) {
               return (
                 <Link

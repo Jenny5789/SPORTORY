@@ -1,6 +1,4 @@
-/* =========================================================
-   MATCHES
-   ========================================================= */
+/* MATCHES */
 .player-matches {
   padding: clamp(80px, 9vw, 120px) 0 0;
   border-top: 1px solid var(--hair);
@@ -217,9 +215,7 @@
   line-height: 1.2;
 }
 
-/* =========================================================
-   TABLET
-   ========================================================= */
+/* TABLET */
 @media (max-width: 1100px) {
   .tournament-header {
     grid-template-columns: 1fr;

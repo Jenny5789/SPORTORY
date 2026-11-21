@@ -1,3 +1,9 @@
+"""Overview 원본 JSON을 정제해 players 테이블에 UPSERT.
+
+입력: data/raw/{player_id}_overview.json → 출력: players 테이블
+실행: python crawler/save_player_to_db.py
+"""
+
 import json
 import os
 
@@ -10,6 +16,7 @@ load_dotenv()
 
 
 def save_player_to_db(player_id, player_slug):
+    """Overview 응답의 선수 프로필 필드를 players 컬럼에 매핑해 저장 또는 갱신."""
     player_id = player_id.strip().lower()
     player_slug = player_slug.strip().lower()
 
@@ -37,6 +44,7 @@ def save_player_to_db(player_id, player_slug):
 
 
     # 4. players 테이블에 선수 저장/갱신
+    # player_id 기준 UPSERT: 재실행 시 중복 행 없이 프로필 갱신
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -75,6 +83,8 @@ def save_player_to_db(player_id, player_slug):
                 backhand = EXCLUDED.backhand,
                 pro_year = EXCLUDED.pro_year
             """,
+            # BirthDate는 앞 10자리(YYYY-MM-DD)만 사용, 시간 제거
+            # PlayHand, BackHand는 중첩 객체에서 Description만 추출
             (
                 player_id,
                 player_slug,

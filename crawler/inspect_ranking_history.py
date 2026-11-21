@@ -1,3 +1,9 @@
+"""Sinner 순위 이력 원본 JSON의 구조 확인용 스크립트.
+
+입력: data/raw/sinner_ranking_history_response.json → 출력: 최상위 Key, History 개수, 첫 번째 History 콘솔 출력
+실행: python crawler/inspect_ranking_history.py
+"""
+
 import json
 
 

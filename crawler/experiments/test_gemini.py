@@ -1,3 +1,8 @@
+"""Gemini API(gemini-3.1-flash-lite) 영한 번역 호출 실험.
+
+Bio 예시 문장 1개의 번역 결과 출력.
+"""
+
 import os
 
 from dotenv import load_dotenv

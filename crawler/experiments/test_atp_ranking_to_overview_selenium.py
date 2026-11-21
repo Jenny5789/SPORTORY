@@ -1,3 +1,8 @@
+"""Selenium으로 랭킹 페이지에서 Overview 페이지까지 이동하는 실험.
+
+랭킹 1위 선수의 상세 링크 추출 후 Overview 페이지 이동, 페이지 제목과 선수 이름 출력.
+"""
+
 import time
 
 from selenium import webdriver

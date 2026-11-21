@@ -1,3 +1,8 @@
+"""선수 조회 API 라우터 (/players).
+
+선수 목록, 상세, Biography, 순위 이력, 통계, 경기 기록 조회용 GET 엔드포인트 6개.
+"""
+
 from fastapi import APIRouter, HTTPException, Query
 
 from backend.database import get_connection
@@ -11,10 +16,15 @@ router = APIRouter(
 
 @router.get("")
 def get_players():
+    """GET /players: 선수 목록, 선수별 최신 단식 순위와 포인트 반환."""
     connection = get_connection()
 
     try:
         with connection.cursor() as cursor:
+            # player_images LEFT JOIN: 이미지 없는 선수도 목록에 포함
+            # LATERAL 서브쿼리: 선수별 최신 순위 1건(rank_date DESC, LIMIT 1) 결합
+            # 선수마다 /rankings 추가 요청(N+1) 대신 1회 조회로 목록 구성
+            # NULLS LAST: 순위 없는 선수는 목록 끝에 배치
             cursor.execute(
                 """
                SELECT
@@ -52,6 +62,7 @@ def get_players():
     for row in rows:
         image_url = None
 
+        # image_path 빈 값은 None으로 반환
         if row[7]:
             image_url = row[7]
 
@@ -74,10 +85,12 @@ def get_players():
 
 @router.get("/{player_id}/bio")
 def get_player_bio(player_id: str):
+    """GET /players/{player_id}/bio: personal, career 섹션별 Biography 원문과 번역문 반환."""
     connection = get_connection()
 
     try:
         with connection.cursor() as cursor:
+            # personal, career 순서로 섹션 정렬 후 섹션 안에서 item_order 순
             cursor.execute(
                 """
                 SELECT
@@ -103,6 +116,7 @@ def get_player_bio(player_id: str):
     finally:
         connection.close()
 
+    # 조회 결과 0건이면 빈 응답 대신 404
     if not rows:
         raise HTTPException(
             status_code=404,
@@ -123,6 +137,7 @@ def get_player_bio(player_id: str):
             "translated_text": row[3]
         }
 
+        # personal, career 외 섹션은 응답에서 제외
         if section in bio:
             bio[section].append(item)
 
@@ -130,6 +145,7 @@ def get_player_bio(player_id: str):
 
 @router.get("/{player_id}")
 def get_player(player_id: str):
+    """GET /players/{player_id}: 선수 상세 정보와 이미지 URL 반환."""
     connection = get_connection()
 
     try:
@@ -192,6 +208,7 @@ def get_player_rankings(
     player_id: str,
     limit: int = Query(default=10, ge=1, le=100)
     ):
+    """GET /players/{player_id}/rankings: 최신순 순위 이력 반환 (limit 기본 10, 1~100)."""
     connection = get_connection()
 
     try:
@@ -219,6 +236,7 @@ def get_player_rankings(
     finally:
         connection.close()
 
+    # 조회 결과 0건이면 빈 배열 대신 404
     if not rows:
         raise HTTPException(
             status_code=404,
@@ -244,10 +262,12 @@ def get_player_rankings(
 
 @router.get("/{player_id}/stats")
 def get_player_stats(player_id: str):
+    """GET /players/{player_id}/stats: 연도, category, surface별 서브, 리턴 통계 반환."""
     connection = get_connection()
 
     try:
         with connection.cursor() as cursor:
+            # 최신 연도 우선, event_year 없는 행은 마지막 배치
             cursor.execute(
                 """
                 SELECT
@@ -285,6 +305,7 @@ def get_player_stats(player_id: str):
     finally:
         connection.close()
 
+    # 조회 결과 0건이면 빈 배열 대신 404
     if not rows:
         raise HTTPException(
             status_code=404,
@@ -328,10 +349,13 @@ def get_player_matches(
     player_id: str,
     limit: int = Query(default=10, ge=1, le=100)
 ):
+    """GET /players/{player_id}/matches: 최근 경기 결과와 대회 정보 반환 (limit 기본 10, 1~100)."""
     connection = get_connection()
 
     try:
         with connection.cursor() as cursor:
+            # tournaments JOIN: 경기별 대회명, 일정, 코트 정보 결합 (대회 정보 없는 경기 제외)
+            # 정렬: 대회 시작일 최신순, 같은 대회 안에서는 round_id 정수 변환 후 내림차순
             cursor.execute(
                 """
                 SELECT
@@ -377,6 +401,7 @@ def get_player_matches(
     finally:
         connection.close()
 
+    # 조회 결과 0건이면 빈 배열 대신 404
     if not rows:
         raise HTTPException(
             status_code=404,

@@ -1,5 +1,7 @@
+// 선수 상세 Matches 섹션: 최근 경기 결과를 대회별로 묶어 표시
 import './PlayerMatches.css'
 
+// 대회 등급 코드 → 표시 라벨, 미정의 코드는 원본 값 그대로 표시
 function formatEventType(eventType) {
   const eventTypeLabels = {
     GS: 'GRAND SLAM',
@@ -13,11 +15,13 @@ function formatEventType(eventType) {
   return eventTypeLabels[eventType] || eventType
 }
 
+// 'YYYY-MM-DD' 시작일, 종료일 → 'YYYY.MM.DD' 형식 기간 문자열, 날짜 누락 시 빈 문자열
 function formatTournamentDate(startDate, endDate) {
   if (!startDate || !endDate) return ''
   return `${startDate.replaceAll('-', '.')} — ${endDate.replaceAll('-', '.')}`
 }
 
+// score 객체에서 선수, 상대 게임 수가 모두 있는 세트만 배열로 추출
 function getMatchSets(score) {
   if (!score) return []
   return Object.values(score).filter(
@@ -25,6 +29,8 @@ function getMatchSets(score) {
   )
 }
 
+// 대회명, 시작일, 종료일 조합 키로 경기 그룹화
+// 그룹 순서는 API 응답 순서(대회 시작일 내림차순) 기준 첫 등장 순
 function groupMatchesByTournament(matches) {
   const groups = []
 
@@ -48,6 +54,7 @@ function groupMatchesByTournament(matches) {
   return groups
 }
 
+// matches: GET /players/{player_id}/matches 응답 배열
 function PlayerMatches({ matches }) {
   const tournamentGroups = groupMatchesByTournament(matches)
 

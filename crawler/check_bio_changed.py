@@ -1,3 +1,9 @@
+"""새로 수집한 Biography와 DB 저장 원문 비교, 번역 필요 여부 판단.
+
+입력: data/raw/{player_id}_bio.json, player_bios 테이블 → 출력: 변경 여부(bool)
+실행: python crawler/check_bio_changed.py
+"""
+
 import json
 import os
 from pathlib import Path
@@ -10,6 +16,7 @@ load_dotenv()
 
 
 def check_bio_changed(player_id):
+    """Personal, Career 섹션별 원문 리스트 비교. 기존 Bio 없음 또는 변경 시 True, 동일 시 False 반환."""
     player_id = player_id.strip().lower()
 
     # 새로 수집한 Bio Raw JSON 읽기
@@ -37,6 +44,7 @@ def check_bio_changed(player_id):
 
     try:
         with conn.cursor() as cur:
+            # item_order 순 정렬: 새 Bio 리스트와 항목 순서까지 비교
             cur.execute(
                 """
                 SELECT section, item_order, original_text

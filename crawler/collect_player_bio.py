@@ -1,3 +1,9 @@
+"""ATP 선수 Biography HTML 추출.
+
+입력: player_id, player_slug → 출력: data/raw/{player_id}_bio.json (Personal, Career 항목 리스트)
+실행: python crawler/collect_player_bio.py
+"""
+
 import json
 from datetime import datetime
 from pathlib import Path
@@ -9,6 +15,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 def collect_player_bio(player_id, player_slug):
+    """Bio 페이지의 Personal, Career 탭 항목을 텍스트 리스트로 추출해 JSON 파일로 저장."""
     player_id = player_id.strip().lower()
     player_slug = player_slug.strip().lower()
 
@@ -27,6 +34,7 @@ def collect_player_bio(player_id, player_slug):
     try:
         driver.get(url)
 
+        # 선수 이름 요소 렌더링까지 최대 60초 대기
         WebDriverWait(driver, 60).until(
             EC.presence_of_element_located(
                 (By.CSS_SELECTOR, ".player_name")
@@ -38,6 +46,7 @@ def collect_player_bio(player_id, player_slug):
             ".player_name"
         ).text.strip()
 
+        # 첫 번째 탭 Personal, 두 번째 탭 Career
         bio_tabs = driver.find_elements(
             By.CSS_SELECTOR,
             ".atp_player-bio .tabs"
@@ -58,6 +67,7 @@ def collect_player_bio(player_id, player_slug):
             ".basic-content li"
         )
 
+        # textContent 사용: 화면에 표시되지 않은 항목 텍스트도 추출, 빈 항목 제외
         personal = []
 
         for item in personal_items:

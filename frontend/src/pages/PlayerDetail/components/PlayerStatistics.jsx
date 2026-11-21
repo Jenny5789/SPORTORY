@@ -1,6 +1,9 @@
+// 선수 상세 Statistics 섹션: 커리어 전체 코트 기준 서브, 리턴 통계
 import './PlayerStatistics.css'
 
+// stats: GET /players/{player_id}/stats 응답 (category, surface별 통계 행 배열)
 function PlayerStatistics({ stats }) {
+  // Career, ALL 행만 사용, 없으면 섹션 생략
   const careerStats = stats.find(
     (item) => item.category === 'Career' && item.surface === 'ALL',
   )

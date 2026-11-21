@@ -1,3 +1,9 @@
+"""순위 이력 원본 JSON을 정제해 player_ranking_history 테이블에 UPSERT.
+
+입력: data/raw/{player_id}_ranking_history_response.json → 출력: player_ranking_history 테이블
+실행: python crawler/save_player_ranking_history_to_db.py
+"""
+
 import json
 import os
 
@@ -10,6 +16,7 @@ load_dotenv()
 
 
 def save_player_ranking_history_to_db(player_id):
+    """History 항목별 단식(Roll, Race), 복식 순위와 포인트를 player_ranking_history에 저장 또는 갱신."""
     player_id = player_id.strip().lower()
 
     # 2. 해당 선수의 Ranking History Raw JSON 읽기
@@ -34,6 +41,8 @@ def save_player_ranking_history_to_db(player_id):
 
 
     # 4. History의 각 랭킹 기록을 반복해서 저장
+    # (player_id, rank_date) 기준 UPSERT: 같은 날짜 순위 중복 방지
+    # RankDate는 앞 10자리(YYYY-MM-DD)만 사용, 시간 제거
     with conn.cursor() as cur:
 
         for history in ranking_data["History"]:

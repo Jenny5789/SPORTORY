@@ -1,3 +1,9 @@
+"""주간 정기 수집 실행: DB 등록 선수 전체의 Stats, Ranking History, Matches 수집과 저장.
+
+입력: players 테이블 (player_id, player_slug) → 출력: raw_data, player_stats, player_ranking_history, matches 테이블, logs/collection_{날짜}.log
+실행: python crawler/get_players_from_db.py (Windows 작업 스케줄러 주 2회 실행 대상)
+"""
+
 import os
 import random
 import time
@@ -39,6 +45,7 @@ logging.basicConfig(
 
 
 def run_collection():
+    """players 테이블의 선수별로 Stats, Ranking History, Matches를 수집, 원본 저장, 정제 저장 순서로 처리."""
 
     logging.info("[START] 정기 수집 시작")
 
@@ -74,6 +81,8 @@ def run_collection():
             print("=" * 60)
 
             results = []
+
+            # 데이터 종류별 개별 try: 한 종류 실패 시 로그 기록 후 다음 종류, 다음 선수 계속 진행
 
             # Stats
             try:
@@ -133,6 +142,7 @@ def run_collection():
                 )
 
             # 마지막 선수 뒤에는 대기하지 않음
+            # 선수 사이 5~10초 무작위 대기
             if index < len(players) - 1:
                 wait_time = random.uniform(5, 10)
 

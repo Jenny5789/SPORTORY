@@ -1,3 +1,9 @@
+"""번역된 Biography JSON을 player_bios 테이블에 UPSERT.
+
+입력: data/processed/{player_id}_bio_translated.json → 출력: player_bios 테이블 (영문 원문, 한글 번역)
+실행: python crawler/save_player_bios_to_db.py
+"""
+
 import json
 import os
 from pathlib import Path
@@ -10,6 +16,7 @@ load_dotenv()
 
 
 def save_player_bios_to_db(player_id):
+    """Personal, Career 섹션 항목별 원문과 번역문을 player_bios에 저장 또는 갱신."""
     player_id = player_id.strip().lower()
 
     input_path = (
@@ -40,6 +47,7 @@ def save_player_bios_to_db(player_id):
         password=os.getenv("DB_PASSWORD")
     )
 
+    # (player_id, section, item_order) 기준 UPSERT: 항목 순서별 1행 유지, 재실행 시 원문과 번역 갱신
     insert_sql = """
     INSERT INTO player_bios (
         player_id,

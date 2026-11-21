@@ -1,3 +1,8 @@
+"""Selenium으로 ATP 선수 Overview 페이지 프로필 항목 추출 실험.
+
+.pd_left, .pd_right 목록에서 항목 이름(Age, Country 등) 기준으로 값 추출.
+"""
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait

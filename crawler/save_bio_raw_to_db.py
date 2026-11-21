@@ -1,3 +1,9 @@
+"""Biography 원본 JSON을 raw_data 테이블에 저장.
+
+입력: data/raw/{player_id}_bio.json → 출력: raw_data 테이블 (source_type=player_bio)
+실행: python crawler/save_bio_raw_to_db.py
+"""
+
 import json
 import os
 from pathlib import Path
@@ -10,6 +16,7 @@ load_dotenv()
 
 
 def save_bio_raw_to_db(player_id):
+    """선수 Bio 원본 파일의 메타데이터는 컬럼으로, data 항목은 raw_json으로 raw_data에 INSERT."""
     player_id = player_id.strip().lower()
 
     file_path = Path("data/raw") / f"{player_id}_bio.json"
@@ -37,6 +44,7 @@ def save_bio_raw_to_db(player_id):
     )
 
     try:
+        # ON CONFLICT 없이 INSERT
         with connection.cursor() as cursor:
             cursor.execute(
                 """

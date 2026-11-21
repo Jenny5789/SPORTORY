@@ -1,3 +1,8 @@
+"""Selenium, CDP Network 로그로 선수 이미지 응답 추출 실험.
+
+Overview 페이지 로드 중 수신한 player-gladiator-headshot 응답을 requestId로 조회, data/player_images에 PNG 저장.
+"""
+
 import base64
 import json
 from pathlib import Path
@@ -20,6 +25,7 @@ output_path.parent.mkdir(parents=True, exist_ok=True)
 
 options = webdriver.ChromeOptions()
 
+# performance 로그 활성화: get_log("performance")로 Network 이벤트 조회
 options.set_capability(
     "goog:loggingPrefs",
     {
@@ -75,6 +81,7 @@ try:
         }
     )
 
+    # 이미지 등 바이너리 본문은 base64 문자열로 전달
     if body["base64Encoded"]:
         image_bytes = base64.b64decode(body["body"])
     else:

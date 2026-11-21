@@ -1,3 +1,10 @@
+"""단일 선수(Sinner) Overview 원본 저장 테스트용 스크립트.
+
+개발자 도구에서 확인한 hero 응답 값을 코드에 직접 입력, raw 형식(메타데이터 + data)으로 저장.
+입력: 코드 내 고정 데이터 → 출력: data/raw/sinner_overview.json
+실행: python crawler/save_sinner_raw.py
+"""
+
 import json
 from datetime import datetime
 

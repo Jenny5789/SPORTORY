@@ -1,3 +1,9 @@
+"""ATP Singles Ranking에서 DB 미등록 선수를 찾아 신규 등록 후 전체 데이터 수집.
+
+입력: ATP Singles Ranking 페이지, players 테이블 → 출력: Profile, Statistics, Ranking History, Matches, Bio, Image 저장 테이블 (raw_data 포함)
+실행: python crawler/add_new_players.py (후보 10명 출력 후 y 입력 시 수집)
+"""
+
 import os
 import random
 import re
@@ -45,6 +51,7 @@ NEW_PLAYER_COUNT = 10
 
 # 1. SPORTORY DB에 이미 등록된 선수 확인
 def get_existing_player_ids():
+    """players 테이블의 player_id 집합(소문자) 반환."""
 
     conn = psycopg.connect(
         host=os.getenv("DB_HOST"),
@@ -77,6 +84,7 @@ def get_existing_player_ids():
 
 # 2. ATP Singles Ranking 선수 목록 확인
 def get_ranking_players():
+    """Ranking 페이지의 선수 링크에서 player_id, player_slug, name 목록을 페이지 순서대로 반환."""
 
     options = Options()
     driver = webdriver.Chrome(options=options)
@@ -104,6 +112,7 @@ def get_ranking_players():
         players = []
         seen = set()
 
+        # /en/players/{player_slug}/{player_id} 경로에서 slug, player_id 추출
         pattern = re.compile(
             r"/en/players/([^/]+)/([^/]+)"
         )
@@ -156,6 +165,7 @@ def get_ranking_players():
 
 # 3. DB에 없는 신규 선수 10명 찾기
 def find_new_players(count=NEW_PLAYER_COUNT):
+    """Ranking 순서대로 DB 미등록 선수를 최대 count명 반환."""
 
     existing_ids = get_existing_player_ids()
 
@@ -206,6 +216,11 @@ def find_new_players(count=NEW_PLAYER_COUNT):
 
 # 4. 신규 선수 전체 데이터 수집
 def collect_new_player(player):
+    """선수 1명의 6종 데이터 수집과 저장. Profile 실패 시 즉시 종료, 그 외 실패는 기록 후 계속.
+
+    Returns:
+        (성공 항목 리스트, 실패 항목 리스트)
+    """
 
     player_id = player["player_id"]
     player_slug = player["player_slug"]
@@ -313,6 +328,7 @@ def collect_new_player(player):
 
         save_bio_raw_to_db(player_id)
 
+        # 기존 Bio 없음 또는 변경 시에만 Gemini 번역과 player_bios 저장
         bio_changed = check_bio_changed(
             player_id
         )
@@ -381,6 +397,7 @@ def collect_new_player(player):
 
 # 5. 신규 선수 10명 전체 수집 실행
 def add_new_players(players):
+    """신규 선수 목록 순서대로 전체 데이터 수집, 전체 성공과 일부 실패 선수 수 출력."""
 
     complete_count = 0
     error_count = 0

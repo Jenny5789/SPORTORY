@@ -1,3 +1,9 @@
+"""ATP 선수 헤드샷 이미지 수집.
+
+입력: player_id, player_slug → 출력: data/player_images/{player_id}.png, data/raw/{player_id}_image_metadata.json
+실행: python crawler/collect_player_image.py
+"""
+
 import base64
 import json
 from datetime import datetime
@@ -8,6 +14,7 @@ from selenium import webdriver
 
 
 def collect_player_image(player_id, player_slug):
+    """Overview 페이지의 CDP Network 로그에서 헤드샷 이미지 응답을 찾아 PNG 파일과 메타데이터 JSON으로 저장."""
     player_id = player_id.strip().lower()
     player_slug = player_slug.strip().lower()
 
@@ -29,6 +36,7 @@ def collect_player_image(player_id, player_slug):
 
     options = webdriver.ChromeOptions()
 
+    # performance 로그 활성화 (Network 이벤트 기록)
     options.set_capability(
         "goog:loggingPrefs",
         {
@@ -63,6 +71,7 @@ def collect_player_image(player_id, player_slug):
             response = params["response"]
             url = response["url"]
 
+            # 헤드샷 이미지 응답만 필터링
             if target_text in url:
                 image_request_id = params["requestId"]
                 image_url = url
@@ -81,6 +90,7 @@ def collect_player_image(player_id, player_slug):
                 "Network 로그에서 선수 이미지 응답을 찾지 못했습니다."
             )
 
+        # 상태 코드 200, image/* MIME 타입만 허용
         if image_status != 200:
             raise RuntimeError(
                 f"이미지 응답 상태가 정상적이지 않습니다: "
@@ -92,6 +102,7 @@ def collect_player_image(player_id, player_slug):
                 f"이미지 응답이 아닙니다: {mime_type}"
             )
 
+        # requestId로 이미지 응답 본문 조회
         body = driver.execute_cdp_cmd(
             "Network.getResponseBody",
             {
@@ -99,6 +110,7 @@ def collect_player_image(player_id, player_slug):
             }
         )
 
+        # 바이너리 응답은 base64로 전달, 디코딩 후 bytes로 저장
         if body["base64Encoded"]:
             image_bytes = base64.b64decode(body["body"])
         else:

@@ -1,3 +1,9 @@
+"""Biography 영문 원문을 Gemini API로 한국어 번역.
+
+입력: data/raw/{player_id}_bio.json → 출력: data/processed/{player_id}_bio_translated.json (항목별 원문, 번역문)
+실행: python crawler/translate_player_bio.py
+"""
+
 import json
 import os
 from pathlib import Path
@@ -22,6 +28,11 @@ client = genai.Client(api_key=api_key)
 
 # Personal 또는 Career Section을 한 번에 번역하는 함수
 def translate_section(section_name, texts):
+    """섹션 원문 리스트를 Gemini 1회 호출로 번역.
+
+    Returns:
+        item_order, original_text, translated_text를 담은 dict 리스트 (원문 순서 유지)
+    """
     items = []
 
     # 각 문장에 순서를 부여하여 원문과 번역문을 다시 연결할 수 있도록 구성
@@ -58,6 +69,7 @@ def translate_section(section_name, texts):
         config=types.GenerateContentConfig(
             temperature=0.2,
             response_mime_type="application/json",
+            # 응답 스키마 고정: {item_order, translated_text} 객체 배열
             response_schema={
                 "type": "ARRAY",
                 "items": {
@@ -110,6 +122,7 @@ def translate_section(section_name, texts):
 
 
 def translate_player_bio(player_id):
+    """선수 Bio의 Personal, Career 섹션을 각각 번역해 Processed JSON 파일로 저장."""
     player_id = player_id.strip().lower()
 
     # 수집된 Bio Raw JSON과 번역 결과를 저장할 경로 설정

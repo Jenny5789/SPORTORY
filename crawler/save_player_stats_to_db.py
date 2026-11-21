@@ -1,3 +1,9 @@
+"""통계 원본 JSON을 정제해 player_stats 테이블에 UPSERT.
+
+입력: data/raw/{player_id}_stats_response.json → 출력: player_stats 테이블
+실행: python crawler/save_player_stats_to_db.py
+"""
+
 import json
 import os
 
@@ -10,6 +16,7 @@ load_dotenv()
 
 
 def save_player_stats_to_db(player_id):
+    """서브(ServiceRecordStats), 리턴(ReturnRecordStats) 중첩 객체를 player_stats 한 행으로 펼쳐 저장 또는 갱신."""
     player_id = player_id.strip().lower()
 
     # 2. 해당 선수의 Stats Raw JSON 읽기
@@ -49,6 +56,8 @@ def save_player_stats_to_db(player_id):
 
 
     # 6. player_stats 저장
+    # (player_id, category, surface, event_year) 기준 UPSERT: 같은 조건 통계 중복 방지
+    # RankDate는 앞 10자리(YYYY-MM-DD)만 사용, 시간 제거
     with conn.cursor() as cur:
         cur.execute(
             """

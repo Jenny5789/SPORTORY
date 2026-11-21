@@ -1,3 +1,8 @@
+"""requests로 ATP 선수 Bio 페이지 요청 실험.
+
+응답 상태 코드, HTML 길이, Career 문장 포함 여부 확인.
+"""
+
 import requests
 
 

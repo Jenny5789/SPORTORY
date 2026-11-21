@@ -1,3 +1,9 @@
+"""경기 기록(Activity) 원본 JSON을 정제해 matches 테이블에 UPSERT.
+
+입력: data/raw/{player_id}_activity_response.json → 출력: matches 테이블 (tournaments 테이블 선행 저장 필요)
+실행: python crawler/save_matches_to_db.py
+"""
+
 import json
 import os
 
@@ -10,6 +16,7 @@ load_dotenv()
 
 
 def save_matches_to_db(player_id):
+    """연도, 대회, 경기 3단계 중첩 구조를 순회하며 경기별 결과와 세트 스코어를 matches에 저장 또는 갱신."""
     player_id = player_id.strip().lower()
 
     # 2. 해당 선수의 Activity Raw JSON 읽기
@@ -55,6 +62,7 @@ def save_matches_to_db(player_id):
                 source_event_id = str(tournament["EventId"])
 
                 # 6. 해당 대회의 SPORTORY tournament_id 찾기
+                # (source, source_event_id, event_year) 조합으로 조회
                 cur.execute(
                     """
                     SELECT tournament_id
@@ -72,6 +80,7 @@ def save_matches_to_db(player_id):
 
                 tournament_row = cur.fetchone()
 
+                # tournaments에 없는 대회는 경기 저장 생략
                 if tournament_row is None:
                     print(
                         f"대회 없음: {event_year} "
@@ -85,9 +94,11 @@ def save_matches_to_db(player_id):
                 # 7. 해당 대회의 경기 순회
                 for match in tournament["Matches"]:
 
+                    # Round 누락 또는 null 시 빈 dict 사용
                     round_data = match.get("Round") or {}
 
                     # 8. matches 테이블 저장
+                    # (tournament_id, player_id, source_match_id) 기준 UPSERT: 같은 경기 중복 방지
                     cur.execute(
                         """
                         INSERT INTO matches (

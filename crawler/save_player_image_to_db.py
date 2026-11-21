@@ -1,3 +1,9 @@
+"""선수 이미지를 Supabase Storage에 업로드하고 player_images 테이블에 UPSERT.
+
+입력: data/raw/{player_id}_image_metadata.json, data/player_images/{player_id}.png → 출력: Storage player-images 버킷, player_images 테이블
+실행: python crawler/save_player_image_to_db.py
+"""
+
 import json
 import os
 from pathlib import Path
@@ -11,6 +17,7 @@ load_dotenv()
 
 
 def save_player_image_to_db(player_id):
+    """로컬 이미지를 Storage에 업로드한 뒤 Public URL과 수집 메타데이터를 player_images에 저장."""
     player_id = player_id.strip().lower()
 
     # 이미지 Metadata
@@ -69,6 +76,7 @@ def save_player_image_to_db(player_id):
         image_bytes = file.read()
 
     # Supabase Storage 업로드
+    # upsert 옵션: 같은 경로 파일이 있으면 덮어쓰기
     supabase.storage.from_("player-images").upload(
         path=storage_path,
         file=image_bytes,
@@ -92,6 +100,8 @@ def save_player_image_to_db(player_id):
         password=os.getenv("DB_PASSWORD")
     )
 
+    # (player_id, source) 기준 UPSERT: 선수별 출처당 이미지 1행 유지
+    # image_path에는 로컬 경로 대신 Storage Public URL 저장
     insert_sql = """
     INSERT INTO player_images (
         player_id,

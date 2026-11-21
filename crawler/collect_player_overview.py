@@ -1,3 +1,9 @@
+"""ATP 선수 프로필(Overview) API 응답 수집.
+
+입력: player_id, player_slug → 출력: data/raw/{player_id}_overview.json (/players/hero/{player_id} 응답 + 수집 메타데이터)
+실행: python crawler/collect_player_overview.py
+"""
+
 import base64
 import json
 import os
@@ -9,6 +15,7 @@ from selenium.webdriver.chrome.options import Options
 
 
 def collect_player_overview(player_id, player_slug):
+    """Overview 페이지 접속 후 CDP Network 로그에서 프로필 API 응답을 찾아 메타데이터와 함께 JSON 파일로 저장."""
     player_id = player_id.strip().lower()
     player_slug = player_slug.strip().lower()
 
@@ -23,6 +30,7 @@ def collect_player_overview(player_id, player_slug):
 
     options = Options()
 
+    # performance 로그 활성화 (Network 이벤트 기록)
     options.set_capability(
         "goog:loggingPrefs",
         {"performance": "ALL"}
@@ -43,6 +51,7 @@ def collect_player_overview(player_id, player_slug):
 
         driver.get(overview_url)
 
+        # 페이지 내 API 요청 완료 대기
         time.sleep(5)
 
         performance_logs = driver.get_log("performance")
@@ -55,6 +64,7 @@ def collect_player_overview(player_id, player_slug):
         for log in performance_logs:
             message = json.loads(log["message"])["message"]
 
+            # 응답 수신 이벤트만 처리
             if message["method"] != "Network.responseReceived":
                 continue
 
@@ -63,6 +73,7 @@ def collect_player_overview(player_id, player_slug):
 
             response_url = response.get("url", "")
 
+            # 프로필 API 응답만 필터링
             if target_pattern not in response_url:
                 continue
 
@@ -74,6 +85,7 @@ def collect_player_overview(player_id, player_slug):
             request_id = params["requestId"]
 
             try:
+                # requestId로 응답 본문 조회
                 body_result = driver.execute_cdp_cmd(
                     "Network.getResponseBody",
                     {"requestId": request_id}
@@ -81,6 +93,7 @@ def collect_player_overview(player_id, player_slug):
 
                 body = body_result["body"]
 
+                # base64 인코딩 응답은 디코딩 후 파싱
                 if body_result.get("base64Encoded"):
                     body = base64.b64decode(body).decode("utf-8")
 
@@ -93,6 +106,7 @@ def collect_player_overview(player_id, player_slug):
 
                 break
 
+            # 본문 조회 실패 시 다음 응답 확인
             except Exception as error:
                 print(f"응답 Body 읽기 실패: {error}")
 
@@ -102,6 +116,7 @@ def collect_player_overview(player_id, player_slug):
             )
 
         # ATP 응답 구조 확인
+        # data 객체로 감싼 응답이면 내부 객체 사용
         if (
             isinstance(overview_data, dict)
             and isinstance(overview_data.get("data"), dict)
@@ -135,6 +150,7 @@ def collect_player_overview(player_id, player_slug):
                 + ", ".join(missing_fields)
             )
 
+        # 원본 응답에 출처, 수집 시각, 수집 방식 메타데이터 추가
         raw_data = {
             "source": "ATP",
             "source_type": "player_overview",

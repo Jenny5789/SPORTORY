@@ -1,3 +1,9 @@
+"""Overview 원본 JSON을 raw_data 테이블에 저장.
+
+입력: data/raw/{player_id}_overview.json → 출력: raw_data 테이블 (source_type=player_overview)
+실행: python crawler/save_raw_to_db.py
+"""
+
 import json
 import os
 
@@ -9,6 +15,7 @@ load_dotenv()
 
 
 def save_raw_to_db(player_id):
+    """선수 Overview 원본 파일을 메타데이터 포함 그대로 raw_data에 INSERT."""
     player_id = player_id.strip().lower()
 
     # Overview Raw JSON 읽기
@@ -39,6 +46,7 @@ def save_raw_to_db(player_id):
     print("PostgreSQL 연결 성공")
 
     # raw_data 테이블에 저장
+    # ON CONFLICT 없이 INSERT
     with conn.cursor() as cur:
         cur.execute(
             """

@@ -1,3 +1,9 @@
+"""월간 정기 수집 실행: DB 등록 선수 전체의 Profile, Bio, Image 수집과 저장.
+
+입력: players 테이블 (player_id, player_slug) → 출력: raw_data, players, player_bios, player_images 테이블, logs/monthly_collection_{날짜}.log
+실행: python crawler/run_monthly_player_data.py (Windows 작업 스케줄러 월 1회 실행 대상)
+"""
+
 import os
 import random
 import time
@@ -40,6 +46,7 @@ logging.basicConfig(
 
 
 def run_monthly_collection():
+    """players 테이블의 선수별로 Profile, Bio, Image를 수집해 저장. Bio는 원문 변경 시에만 번역."""
 
     logging.info("[START] 월간 수집 시작")
 
@@ -80,6 +87,8 @@ def run_monthly_collection():
 
         results = []
 
+        # 데이터 종류별 개별 try: 한 종류 실패 시 로그 기록 후 다음 종류, 다음 선수 계속 진행
+
         # 1. Profile
         try:
             print("\n[Profile]")
@@ -106,6 +115,7 @@ def run_monthly_collection():
             collect_player_bio(player_id, player_slug)
             save_bio_raw_to_db(player_id)
 
+            # 기존 원문과 비교, 변경 시에만 Gemini 번역과 player_bios 저장
             bio_changed = check_bio_changed(player_id)
 
             if bio_changed:
@@ -153,6 +163,7 @@ def run_monthly_collection():
             )
 
         # 마지막 선수 뒤에는 대기하지 않음
+        # 선수 사이 5~10초 무작위 대기
         if index < len(players) - 1:
             wait_time = random.uniform(5, 10)
 

@@ -1,3 +1,4 @@
+// About 화면 (/about): 서비스 소개 정적 페이지, API 호출 없음
 import { Link } from 'react-router-dom'
 
 import Header from '../../components/Header/Header'
@@ -8,9 +9,7 @@ function About() {
     <main className="about-page">
       <Header />
 
-      {/* =====================================================
-          HERO
-      ===================================================== */}
+      {/* HERO */}
       <section className="about-hero">
         <div className="about-hero-index">
           <span>ABOUT SPORTORY</span>
@@ -42,9 +41,7 @@ function About() {
         </div>
       </section>
 
-      {/* =====================================================
-          WHAT IS SPORTORY
-      ===================================================== */}
+      {/* WHAT IS SPORTORY */}
       <section className="about-intro">
         <div className="about-section-label">
           <span>01</span>
@@ -78,9 +75,7 @@ function About() {
         </div>
       </section>
 
-      {/* =====================================================
-          DATA TO STORY
-      ===================================================== */}
+      {/* DATA TO STORY */}
       <section className="about-data">
         <div className="about-section-label about-section-label--dark">
           <span>02</span>
@@ -118,9 +113,7 @@ function About() {
         </div>
       </section>
 
-      {/* =====================================================
-          TENNIS — FIRST STORY
-      ===================================================== */}
+      {/* TENNIS: FIRST STORY */}
       <section className="about-tennis">
         <div className="about-section-label">
           <span>03</span>
@@ -160,9 +153,7 @@ function About() {
         </div>
       </section>
 
-      {/* =====================================================
-          ENDING
-      ===================================================== */}
+      {/* ENDING */}
       <section className="about-ending">
         <p>SPORTS + STORY</p>
 

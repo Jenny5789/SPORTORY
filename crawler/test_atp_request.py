@@ -1,3 +1,8 @@
+"""requests로 ATP 단식 랭킹 페이지 요청 실험.
+
+응답 상태 코드, Content-Type, HTML 앞 500자 확인.
+"""
+
 import requests
 
 url = "https://www.atptour.com/en/rankings/singles"

@@ -1,3 +1,9 @@
+"""경기 기록(Activity) 원본 JSON을 raw_data 테이블에 저장.
+
+입력: data/raw/{player_id}_activity_response.json → 출력: raw_data 테이블 (source_type=player_activity)
+실행: python crawler/save_activity_raw_to_db.py
+"""
+
 import json
 import os
 from datetime import datetime
@@ -12,6 +18,7 @@ load_dotenv()
 
 
 def save_activity_raw_to_db(player_id):
+    """선수 Activity 응답 원본을 출처, 수집 시각과 함께 raw_data에 INSERT."""
     player_id = player_id.strip().lower()
 
     # 2. 해당 선수의 ATP Activity Raw JSON 읽기
@@ -33,6 +40,7 @@ def save_activity_raw_to_db(player_id):
 
 
     # 4. Source URL 생성
+    # 응답 파일에 URL 미포함, API 경로로 재구성
     source_url = (
         f"https://www.atptour.com/en/-/www/activity/sgl/{player_id}/?v=1"
     )
@@ -51,6 +59,7 @@ def save_activity_raw_to_db(player_id):
 
 
     # 6. raw_data 테이블에 저장
+    # ON CONFLICT 없이 INSERT
     with conn.cursor() as cur:
         cur.execute(
             """

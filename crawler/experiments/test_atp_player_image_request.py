@@ -1,3 +1,8 @@
+"""requests로 ATP 선수 이미지(player-gladiator-headshot) 직접 요청 실험.
+
+200 응답, image Content-Type 확인 후 data/player_images에 PNG 저장, 그 외 응답은 앞 500자 출력.
+"""
+
 from pathlib import Path
 
 import requests

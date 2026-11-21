@@ -1,3 +1,8 @@
+"""Playwright(headless)로 ATP 선수 Bio 페이지 HTML 수집 실험.
+
+페이지 제목, HTML 길이, Career 문장 포함 여부 확인.
+"""
+
 from playwright.sync_api import sync_playwright
 
 

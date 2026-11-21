@@ -1,8 +1,10 @@
+// 선수 상세 Profile 섹션: 국적, 이름, 신체 정보, 경기 스타일, 프로 전향 연도, 선수 이미지
 import './PlayerProfile.css'
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 
+// player: GET /players/{player_id} 응답, 값 없는 항목은 대시 기호 표시
 function PlayerProfile({ player }) {
   return (
     <section className="player-profile">

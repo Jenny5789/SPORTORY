@@ -1,6 +1,8 @@
+// 공통 상단 헤더: 워드마크, Home, Sports 드롭다운(Tennis), About 링크
 import { Link } from 'react-router-dom'
 import './Header.css'
 
+// variant: 'overlay' 지정 시 site-header--overlay 클래스 추가 (Home 히어로 위 배치용)
 function Header({ variant = 'default' }) {
   const headerClassName =
     variant === 'overlay'

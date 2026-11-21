@@ -1,11 +1,15 @@
+// 선수 상세 Biography 섹션: PERSONAL, CAREER 분류 탭과 KO, EN 언어 전환
 import { useMemo, useState } from 'react'
 
 import './PlayerBio.css'
 
+// bio: GET /players/{player_id}/bio 응답 ({ personal: [], career: [] })
 function PlayerBio({ bio }) {
   const [category, setCategory] = useState('personal')
   const [language, setLanguage] = useState('ko')
 
+  // 선택 분류 항목을 item_order 순 정렬
+  // KO: 번역문 우선, EN: 원문 우선, 선택 언어 문장이 없으면 다른 언어로 대체, 빈 항목 제외
   const stories = useMemo(() => {
     const items = bio?.[category] ?? []
 
@@ -24,6 +28,7 @@ function PlayerBio({ bio }) {
       .filter((item) => item.text)
   }, [bio, category, language])
 
+  // bio 미수신 시 섹션 생략 (Hook 호출 이후에 반환)
   if (!bio) {
     return null
   }

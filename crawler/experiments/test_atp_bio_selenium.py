@@ -1,3 +1,8 @@
+"""Selenium으로 ATP 선수 Bio 페이지 항목 추출 실험.
+
+.atp_player-bio .tabs 기준 Personal, Career 항목 출력.
+"""
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -44,6 +49,7 @@ if len(bio_tabs) >= 1:
     print("\nPersonal:")
 
     for item in personal_items:
+        # textContent: 숨김 상태 요소의 텍스트까지 반환 (.text는 화면 표시 텍스트만 반환)
         text = item.get_attribute("textContent").strip()
 
         if text:

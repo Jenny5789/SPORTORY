@@ -1,11 +1,20 @@
+/*
+ * 선수 퀵 프로필 팝업 (Players, Home에서 사용)
+ * - 앞면 SPORT: 국적, 이름, ATP 단식 순위, 포인트, 주 사용 손
+ * - 뒷면 STORY: 번역된 Biography 항목 중 무작위 3개
+ * - 카드 클릭, Enter, Space로 앞뒤 전환
+ * - API: GET /players/{player_id}/bio
+ */
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import './PlayerQuickProfile.css'
 
+// 배포 환경은 VITE_API_BASE_URL 사용, 미설정 시 로컬 FastAPI 서버
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 
+// 상세 페이지 링크용 화살표 아이콘
 function ArrowIcon() {
   return (
     <svg
@@ -20,6 +29,7 @@ function ArrowIcon() {
   )
 }
 
+// 카드 뒤집기 안내 아이콘
 function FlipIcon() {
   return (
     <svg
@@ -37,15 +47,16 @@ function FlipIcon() {
   )
 }
 
+// player: 선수 정보, ranking: { singles_rank, singles_points }, onClose: 팝업 닫기 콜백
 function PlayerQuickProfile({ player, ranking, onClose }) {
+  // false: 앞면(SPORT), true: 뒷면(STORY)
   const [isFlipped, setIsFlipped] = useState(false)
   const [bio, setBio] = useState(null)
   const [bioLoading, setBioLoading] = useState(true)
 
-  /* =========================================================
-     KEYBOARD / BODY
-  ========================================================= */
+  /* KEYBOARD / BODY */
 
+  // Esc 키로 닫기, 팝업 열린 동안 body 스크롤 차단
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
@@ -56,16 +67,17 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
     document.addEventListener('keydown', handleKeyDown)
     document.body.style.overflow = 'hidden'
 
+    // 팝업 닫힘 시 리스너 해제, body 스크롤 복원
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
     }
   }, [onClose])
 
-  /* =========================================================
-     BIOGRAPHY
-  ========================================================= */
+  /* BIOGRAPHY */
 
+  // player_id 변경 시 Biography 재조회
+  // cancelled: 언마운트, 선수 변경 이후 도착한 이전 응답의 state 반영 차단
   useEffect(() => {
     let cancelled = false
 
@@ -106,10 +118,9 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
     }
   }, [player.player_id])
 
-  /* =========================================================
-     STORY DATA
-  ========================================================= */
+  /* STORY DATA */
 
+  // personal, career 항목에 분류 라벨 추가 후 번역문(translated_text) 있는 항목만 사용
   const allStoryItems = useMemo(() => {
     if (!bio) return []
 
@@ -132,8 +143,10 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
     )
   }, [bio])
 
+  // 뒷면에 표시할 Biography 3개
   const [storyItems, setStoryItems] = useState([])
 
+  // Fisher-Yates 셔플 후 앞 3개 선택
   const pickRandomStories = () => {
     const shuffledStories = [...allStoryItems]
 
@@ -146,6 +159,7 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
         Math.random() * (i + 1),
       )
 
+      // 행 앞 세미콜론: 직전 Math.floor(...)와 이어져 인덱스 접근으로 해석되는 것 방지
       ;[
         shuffledStories[i],
         shuffledStories[randomIndex],
@@ -158,19 +172,16 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
     setStoryItems(shuffledStories.slice(0, 3))
   }
 
-  /* =========================================================
-     LOAD STORY AFTER BIOGRAPHY
-  ========================================================= */
+  /* LOAD STORY AFTER BIOGRAPHY */
 
+  // Biography 수신 후 첫 스토리 3개 선택
   useEffect(() => {
     if (allStoryItems.length > 0) {
       pickRandomStories()
     }
   }, [allStoryItems])
 
-  /* =========================================================
-     CARD ACTIONS
-  ========================================================= */
+  /* CARD ACTIONS */
 
   const handleCardClick = () => {
     // SPORT → STORY로 뒤집을 때마다
@@ -182,6 +193,7 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
     setIsFlipped((current) => !current)
   }
 
+  // role="button" 카드의 키보드 조작: Enter, Space로 뒤집기
   const handleCardKeyDown = (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
@@ -194,14 +206,14 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
     }
   }
 
+  // 링크, 스토리 목록 조작 시 카드 뒤집기와 오버레이 닫기로 이벤트 전파 차단
   const stopCardAction = (event) => {
     event.stopPropagation()
   }
 
-  /* =========================================================
-     RENDER
-  ========================================================= */
+  /* RENDER */
 
+  // 오버레이 mousedown 시 팝업 닫기, 카드 영역은 stopCardAction으로 제외
   return (
     <div
       className="quick-profile-overlay"
@@ -227,9 +239,7 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
       >
         <div className="quick-profile-inner">
 
-          {/* =================================================
-              FRONT — SPORT
-          ================================================= */}
+          {/* FRONT: SPORT */}
 
           <article className="quick-profile-face quick-profile-front">
             <button
@@ -327,9 +337,7 @@ function PlayerQuickProfile({ player, ranking, onClose }) {
             </div>
           </article>
 
-          {/* =================================================
-              BACK — STORY
-          ================================================= */}
+          {/* BACK: STORY */}
 
           <article className="quick-profile-face quick-profile-back">
             <button

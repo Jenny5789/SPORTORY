@@ -1,9 +1,12 @@
+// 선수 상세 Ranking 섹션: 현재 단식, Race 순위와 단식 순위, 포인트 이력 차트
 import RankingChart from './RankingChart'
 import './PlayerRanking.css'
 
+// rankings: GET /players/{player_id}/rankings 응답, rank_date 내림차순 (API 기본 최근 10건)
 function PlayerRanking({ rankings }) {
   if (rankings.length === 0) return null
 
+  // [0]: 최신 순위, reverse: 차트용 과거 → 최신 순서
   const currentRanking = rankings[0]
   const rankingHistory = [...rankings].reverse()
 

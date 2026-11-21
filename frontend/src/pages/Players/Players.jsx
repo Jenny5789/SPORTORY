@@ -1,3 +1,8 @@
+/*
+ * 테니스 선수 목록 화면 (/tennis/players)
+ * - API: GET /players (선수 정보와 최신 단식 순위, 포인트 포함)
+ * - 카드 클릭 시 PlayerQuickProfile 팝업
+ */
 import { useEffect, useMemo, useState } from 'react'
 
 import Header from '../../components/Header/Header'
@@ -5,9 +10,11 @@ import PlayerQuickProfile from './components/PlayerQuickProfile/PlayerQuickProfi
 
 import './Players.css'
 
+// 배포 환경은 VITE_API_BASE_URL 사용, 미설정 시 로컬 FastAPI 서버
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 
+// 선수 카드 우측 화살표 아이콘
 function ArrowIcon() {
   return (
     <svg
@@ -22,15 +29,15 @@ function ArrowIcon() {
   )
 }
 
+// 선수 카드 목록, ATP 단식 순위 오름차순
 function Players() {
   const [players, setPlayers] = useState([])
+  // player_id → { singles_rank, singles_points }
   const [rankings, setRankings] = useState({})
   const [selectedPlayer, setSelectedPlayer] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  /* =========================================================
-     LOAD PLAYERS + LATEST RANKING
-  ========================================================= */
+  /* LOAD PLAYERS + LATEST RANKING */
 
   useEffect(() => {
     async function loadPlayers() {
@@ -45,6 +52,7 @@ function Players() {
 
         const playerData = await response.json()
 
+        // /players 응답의 최신 순위, 포인트로 순위 맵 생성 (선수별 /rankings 추가 요청 없음)
         const rankingResults = playerData.map((player) => [
           player.player_id,
           {
@@ -58,6 +66,7 @@ function Players() {
           Object.fromEntries(rankingResults),
         )
       } catch (error) {
+        // 실패 시 콘솔 기록, 빈 목록 표시
         console.error(
           'Failed to load players:',
           error,
@@ -70,10 +79,9 @@ function Players() {
     loadPlayers()
   }, [])
 
-  /* =========================================================
-     SORT BY ATP RANKING
-  ========================================================= */
+  /* SORT BY ATP RANKING */
 
+  // 순위 없는 선수는 MAX_SAFE_INTEGER로 처리해 맨 뒤 배치
   const rankedPlayers = useMemo(() => {
     return [...players].sort((a, b) => {
       const rankA =
@@ -88,9 +96,7 @@ function Players() {
     })
   }, [players, rankings])
 
-  /* =========================================================
-     LOADING
-  ========================================================= */
+  /* LOADING */
 
   if (loading) {
     return (
@@ -106,9 +112,7 @@ function Players() {
     )
   }
 
-  /* =========================================================
-     PAGE
-  ========================================================= */
+  /* PAGE */
 
   return (
     <>
@@ -116,9 +120,7 @@ function Players() {
 
       <main className="players-page">
 
-        {/* ===================================================
-            INTRO
-        =================================================== */}
+        {/* INTRO */}
 
         <section className="players-heading">
           <p className="players-kicker">
@@ -140,9 +142,7 @@ function Players() {
           </div>
         </section>
 
-        {/* ===================================================
-            ALL PLAYERS
-        =================================================== */}
+        {/* ALL PLAYERS */}
 
         <section className="all-players">
           <div className="all-players-heading">
@@ -212,9 +212,7 @@ function Players() {
         </section>
       </main>
 
-      {/* =====================================================
-          QUICK PROFILE
-      ===================================================== */}
+      {/* QUICK PROFILE */}
 
       {selectedPlayer && (
         <PlayerQuickProfile

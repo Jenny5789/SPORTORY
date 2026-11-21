@@ -1,3 +1,9 @@
+"""경기 기록(Activity) 원본 JSON에서 대회 정보를 추출해 tournaments 테이블에 UPSERT.
+
+입력: data/raw/{player_id}_activity_response.json → 출력: tournaments 테이블
+실행: python crawler/save_tournaments_to_db.py (실행 시 Player ID 입력)
+"""
+
 import json
 import os
 
@@ -43,6 +49,8 @@ for activity in activity_data["Activity"]:
         location = tournament["Location"]
 
         # 6. tournaments 테이블에 저장
+        # (source, source_event_id, event_year) 기준 UPSERT: 같은 대회의 연도별 개최를 1행씩 유지
+        # EventDate, PlayEndDate는 앞 10자리(YYYY-MM-DD)만 사용, 시간 제거
         with conn.cursor() as cur:
             cur.execute(
                 """
