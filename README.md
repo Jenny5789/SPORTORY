@@ -46,7 +46,7 @@
 
 ---
 
-## 3. 실제 구현 화면
+## 3. 주요 화면
 
 <p align="center">
   <img src="docs/images/screens.png" alt="주요 화면: 홈, 선수 목록, 선수 카드 앞면과 뒷면, 순위" width="100%" />
