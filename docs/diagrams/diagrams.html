@@ -19,7 +19,7 @@
   .lane { font-size: 19px; font-weight: 700; color: #0E4A2B; margin: 4px 0 10px; }
   .lane span { font-size: 16px; font-weight: 400; color: #666; margin-left: 10px; }
 
-  .box { background: #F2F4F3; border-radius: 12px; padding: 18px 20px; }
+  .box { background: #fff; border: 2px solid #D9DEDB; border-radius: 12px; padding: 18px 20px; }
   .box.out { background: #fff; border: 2px solid #D9DEDB; }
   .box.final { background: #fff; border: 2px solid #0E4A2B; }
   .box h3 { font-size: 21px; font-weight: 700; color: #0E4A2B; margin-bottom: 8px; }
@@ -35,11 +35,11 @@
   svg text { font-family: "Malgun Gothic", "맑은 고딕", sans-serif; }
 
   /* 시스템 흐름도 */
-  .sf { display: grid; grid-template-columns: 1fr 64px 250px; grid-template-areas: "l1 . db" "r1 a1 db" "l2 . db" "r2 a2 db"; row-gap: 6px; }
+  .sf { display: grid; grid-template-columns: 1fr 64px 250px; grid-template-areas: "l1 . ." "r1 a1 db" "l2 . db" "r2 a2 db"; row-gap: 6px; }
   .sf .row { display: grid; align-items: stretch; }
   .sf .r1 { grid-template-columns: 1fr 44px 1fr 44px 1fr 44px 1fr; margin-bottom: 26px; }
   .sf .r2 { grid-template-columns: 0.8fr 44px 1fr 108px 1fr; }
-  .sf .row .box { min-height: 160px; }
+  .sf .row .box { min-height: 160px; padding: 18px 14px; }
   .sf .db { grid-area: db; }
   .sf .db .tbl { font-size: 15px; color: #333; margin: 0 0 12px; line-height: 1.5; }
 
@@ -65,47 +65,59 @@
 </head>
 <body>
 
-<!-- ============ 서비스 구조 (일렬) ============ -->
-<section id="architecture">
-  <div style="display:grid; grid-template-columns: 1fr 32px 1fr 32px 1fr 32px 1fr 32px 1fr 32px 1fr;">
-    <div class="box out" style="height:162px; padding:16px"><h3 style="font-size:19px">ATP 웹사이트</h3><div class="tech" style="font-size:15px">데이터 출처</div><p style="font-size:14px">선수 · 순위 · 경기<br>통계 · Bio · 이미지</p></div>
-    <div class="arrow"><svg width="28" height="14"><line x1="0" y1="7" x2="18" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="16,1 28,7 16,13" fill="#0E4A2B"/></svg></div>
-    <div class="box" style="height:162px; padding:16px"><h3 style="font-size:19px">데이터 수집</h3><div class="tech" style="font-size:15px">Selenium · CDP</div><p style="font-size:14px">브라우저 실행<br>JSON · HTML · PNG</p></div>
-    <div class="arrow"><svg width="28" height="14"><line x1="0" y1="7" x2="18" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="16,1 28,7 16,13" fill="#0E4A2B"/></svg></div>
-    <div class="box" style="height:162px; padding:16px"><h3 style="font-size:19px">처리 · 번역</h3><div class="tech" style="font-size:15px">Python · Gemini</div><p style="font-size:14px">Raw 보존 · 정제<br>Bio 영문 → 한글</p></div>
-    <div class="arrow"><svg width="28" height="14"><line x1="0" y1="7" x2="18" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="16,1 28,7 16,13" fill="#0E4A2B"/></svg></div>
-    <div class="box" style="height:162px; padding:16px"><h3 style="font-size:19px">DB 저장</h3><div class="tech" style="font-size:15px">Supabase</div><p style="font-size:14px">PostgreSQL<br>Storage (이미지)</p></div>
-    <div class="arrow"><svg width="28" height="14"><line x1="0" y1="7" x2="18" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="16,1 28,7 16,13" fill="#0E4A2B"/></svg></div>
-    <div class="box" style="height:162px; padding:16px"><h3 style="font-size:19px">API 서버</h3><div class="tech" style="font-size:15px">FastAPI · Render</div><p style="font-size:14px">DB 조회<br>→ JSON 응답</p></div>
-    <div class="arrow"><svg width="28" height="14"><line x1="0" y1="7" x2="18" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="16,1 28,7 16,13" fill="#0E4A2B"/></svg></div>
-    <div class="box" style="height:162px; padding:16px"><h3 style="font-size:19px">웹 화면</h3><div class="tech" style="font-size:15px">React · Vite<br>Vercel</div><p style="font-size:14px">선수 목록<br>카드 · 상세</p></div>
+<!-- ============ 테이블 관계 (코드의 INSERT · ON CONFLICT · JOIN 기준) ============ -->
+<section id="erd">
+  <div style="display:grid; grid-template-columns: repeat(4, 1fr); column-gap:24px;">
+    <div class="box" style="height:132px; padding:16px"><div class="tech mono" style="color:#0E4A2B">player_images</div><p style="font-size:14px; color:#1a1a1a; font-weight:700; margin-bottom:4px">키: player_id, source</p><p style="font-size:14px">image_path<br>source_image_url, collected_at</p></div>
+    <div class="box" style="height:132px; padding:16px"><div class="tech mono" style="color:#0E4A2B">player_ranking_history</div><p style="font-size:14px; color:#1a1a1a; font-weight:700; margin-bottom:4px">키: player_id, rank_date</p><p style="font-size:14px">singles · race · doubles<br>순위와 점수</p></div>
+    <div class="box" style="height:132px; padding:16px"><div class="tech mono" style="color:#0E4A2B">player_stats</div><p style="font-size:14px; color:#1a1a1a; font-weight:700; margin-bottom:4px">키: player_id, category,<br>surface, event_year</p><p style="font-size:14px">서브 · 리턴 통계</p></div>
+    <div class="box" style="height:132px; padding:16px"><div class="tech mono" style="color:#0E4A2B">player_bios</div><p style="font-size:14px; color:#1a1a1a; font-weight:700; margin-bottom:4px">키: player_id, section, item_order</p><p style="font-size:14px">original_text<br>translated_text</p></div>
   </div>
-  <div class="box" style="margin-top:18px; background:#E6EAE8; padding:14px 18px"><span style="font-size:17px; font-weight:700; color:#0E4A2B; margin-right:14px">자동화</span><span style="font-size:16px; font-weight:700; margin-right:14px">Windows 작업 스케줄러</span><span style="font-size:15px; color:#555">순위 · 경기 · 통계 주 2회 / 프로필 · Bio · 이미지 월 1회 자동 수집</span></div>
+  <svg width="1144" height="64" style="display:block">
+    <path d="M134 0 V32 M426 0 V32 M718 0 V32 M1010 0 V32 M134 32 H1010 M530 32 V64" stroke="#0E4A2B" stroke-width="3" fill="none"/>
+    <text x="542" y="56" font-size="14" font-weight="700" fill="#0E4A2B">player_id</text>
+  </svg>
+  <div style="display:grid; grid-template-columns: 330px 400px 1fr;">
+    <div></div>
+    <div class="box final" style="height:128px; padding:16px"><div class="tech mono" style="color:#0E4A2B; font-size:19px">players</div><p style="font-size:14px; color:#1a1a1a; font-weight:700; margin-bottom:4px">키: player_id</p><p style="font-size:14px">이름, 국적, 생년월일, 키 · 체중<br>주로 쓰는 손, 백핸드, 데뷔 연도</p></div>
+    <div></div>
+  </div>
+  <svg width="1144" height="56" style="display:block">
+    <path d="M530 0 V56" stroke="#0E4A2B" stroke-width="3" fill="none"/>
+    <text x="542" y="34" font-size="14" font-weight="700" fill="#0E4A2B">player_id</text>
+  </svg>
+  <div style="display:grid; grid-template-columns: 290px 40px 400px 124px 290px;">
+    <div class="box out" style="height:132px; padding:16px"><div class="tech mono" style="color:#0E4A2B">raw_data</div><p style="font-size:14px">수집 원본 JSON 보관<br>출처 · URL · 선수 ID<br>수집 시각 · 수집 방식</p><p style="font-size:13px; margin-top:6px">서비스 조회에는 사용 안 함</p></div>
+    <div></div>
+    <div class="box" style="height:132px; padding:16px"><div class="tech mono" style="color:#0E4A2B">matches</div><p style="font-size:14px; color:#1a1a1a; font-weight:700; margin-bottom:4px">키: tournament_id, player_id,<br>source_match_id</p><p style="font-size:14px">라운드, 승패, 상대 선수, 세트 점수</p></div>
+    <div class="arrow"><span class="lbl mono">tournament_id</span><svg width="124" height="10"><line x1="0" y1="5" x2="124" y2="5" stroke="#0E4A2B" stroke-width="3"/></svg></div>
+    <div class="box" style="height:132px; padding:16px"><div class="tech mono" style="color:#0E4A2B">tournaments</div><p style="font-size:14px; color:#1a1a1a; font-weight:700; margin-bottom:4px">키: source, source_event_id,<br>event_year</p><p style="font-size:14px">대회명, 도시, 코트, 기간</p></div>
+  </div>
 </section>
 
 <!-- ============ 시스템 흐름도 ============ -->
 <section id="system-flow">
-  <div class="title">SPORTORY 시스템 흐름도</div>
+  <div class="title">SPORTORY 서비스 구조</div>
   <div class="sf">
-    <div class="lane" style="grid-area:l1">데이터 수집 흐름<span>데이터별 주기에 맞춰 자동 실행</span></div>
+    <div class="lane" style="grid-area:l1">데이터 수집 흐름</div>
     <div class="row r1" style="grid-area:r1">
-      <div class="box"><h3><span class="n">1</span>수집 실행</h3><div class="tech">작업 스케줄러</div><p>Windows<br>주 2회 · 월 1회</p></div>
+      <div class="box"><h3>수집 실행</h3><div class="tech">작업 스케줄러</div><p>Windows<br>주 2회 · 월 1회</p></div>
       <div class="arrow"><svg width="40" height="14"><line x1="0" y1="7" x2="30" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="28,1 40,7 28,13" fill="#0E4A2B"/></svg></div>
-      <div class="box"><h3><span class="n">2</span>데이터 수집</h3><div class="tech">Selenium · CDP</div><p>ATP 웹사이트<br>JSON · HTML</p></div>
+      <div class="box"><h3>데이터 수집</h3><div class="tech">Selenium · CDP</div><p>ATP 웹사이트<br>JSON · HTML</p></div>
       <div class="arrow"><svg width="40" height="14"><line x1="0" y1="7" x2="30" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="28,1 40,7 28,13" fill="#0E4A2B"/></svg></div>
-      <div class="box"><h3><span class="n">3</span>원본 저장</h3><div class="tech mono">raw_data</div><p>수집 원본<br>+ 수집 정보</p></div>
+      <div class="box"><h3>원본 저장</h3><div class="tech mono">raw_data</div><p>수집 원본<br>+ 수집 정보</p></div>
       <div class="arrow"><svg width="40" height="14"><line x1="0" y1="7" x2="30" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="28,1 40,7 28,13" fill="#0E4A2B"/></svg></div>
-      <div class="box"><h3><span class="n">4</span>정제 · 번역</h3><div class="tech">Python · Gemini</div><p>정제 · UPSERT<br>Bio 변경 시 번역</p></div>
+      <div class="box"><h3>정제 · 번역</h3><div class="tech">Python · Gemini</div><p>정제 · UPSERT<br>Bio 변경 시 번역</p></div>
     </div>
     <div class="arrow" style="grid-area:a1; margin-bottom:26px"><span class="lbl">저장</span><svg width="56" height="14"><line x1="0" y1="7" x2="44" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="42,1 56,7 42,13" fill="#0E4A2B"/></svg></div>
 
-    <div class="lane" style="grid-area:l2">서비스 요청 흐름<span>사용자 접속 시</span></div>
+    <div class="lane" style="grid-area:l2">서비스 요청 흐름</div>
     <div class="row r2" style="grid-area:r2">
-      <div class="box out"><h3><span class="n">5</span>사용자</h3><div class="tech">브라우저 접속</div><p>선수 목록<br>카드 · 상세 화면</p></div>
+      <div class="box out"><h3>사용자</h3><div class="tech">브라우저 접속</div><p>선수 목록<br>카드 · 상세 화면</p></div>
       <div class="arrow"><svg width="40" height="14"><line x1="0" y1="7" x2="30" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="28,1 40,7 28,13" fill="#0E4A2B"/></svg></div>
-      <div class="box"><h3><span class="n">6</span>웹 화면</h3><div class="tech">React · Vite (Vercel)</div><p>API 요청<br>응답 데이터 표시</p></div>
+      <div class="box"><h3>웹 화면</h3><div class="tech">React · Vite (Vercel)</div><p>API 요청<br>응답 데이터 표시</p></div>
       <div class="arrow"><span class="lbl">요청</span><svg width="96" height="26"><line x1="0" y1="6" x2="84" y2="6" stroke="#0E4A2B" stroke-width="3"/><polygon points="82,0 96,6 82,12" fill="#0E4A2B"/><line x1="12" y1="20" x2="96" y2="20" stroke="#0E4A2B" stroke-width="3"/><polygon points="14,14 0,20 14,26" fill="#0E4A2B"/></svg><span class="lbl2">JSON 응답</span></div>
-      <div class="box"><h3><span class="n">7</span>API 서버</h3><div class="tech">FastAPI (Render)</div><p>DB 조회<br>JSON 응답 반환</p></div>
+      <div class="box"><h3>API 서버</h3><div class="tech">FastAPI (Render)</div><p>DB 조회<br>JSON 응답 반환</p></div>
     </div>
     <div class="arrow" style="grid-area:a2"><span class="lbl">조회</span><svg width="56" height="26"><line x1="0" y1="6" x2="44" y2="6" stroke="#0E4A2B" stroke-width="3"/><polygon points="42,0 56,6 42,12" fill="#0E4A2B"/><line x1="12" y1="20" x2="56" y2="20" stroke="#0E4A2B" stroke-width="3"/><polygon points="14,14 0,20 14,26" fill="#0E4A2B"/></svg></div>
 
@@ -165,26 +177,10 @@
         <text x="32" y="272" font-size="14" font-weight="700" fill="#0E4A2B">변경됨</text>
       </svg>
     </div>
-    <div class="box out" style="grid-row:1; grid-column:5"><h3>번역 생략</h3><div class="tech">Gemini 호출 없음</div><p>불필요한 반복 번역 방지</p></div>
+    <div class="box out" style="grid-row:1; grid-column:5"><h3>번역 생략</h3><div class="tech">Gemini 호출 없음</div><p>같은 원문은 다시 번역하지 않음</p></div>
     <div class="box" style="grid-row:2; grid-column:5"><h3>Gemini 번역</h3><div class="tech">3.1 Flash-Lite</div><p>Personal · Career<br>섹션 단위 일괄 번역<br>JSON 응답 스키마 지정</p></div>
     <div class="arrow" style="grid-row:2; grid-column:6"><svg width="40" height="14"><line x1="0" y1="7" x2="30" y2="7" stroke="#0E4A2B" stroke-width="3"/><polygon points="28,1 40,7 28,13" fill="#0E4A2B"/></svg></div>
     <div class="box" style="grid-row:2; grid-column:7"><h3>검증 · 저장</h3><div class="tech mono">item_order 기준</div><p>원문 ↔ 번역 재연결<br>개수 일치 · 누락 확인<br><span class="mono">player_bios</span> 저장</p></div>
-  </div>
-</section>
-
-<!-- ============ 자동 수집 ============ -->
-<section id="schedule">
-  <div style="display:grid; grid-template-columns: 1fr 80px 1fr 80px 1fr; grid-template-rows: 150px 150px; row-gap: 24px;">
-    <div class="box" style="grid-row:1/3; grid-column:1; align-self:center; height:150px"><h3>수집 실행</h3><div class="tech">Windows 작업 스케줄러</div><p>데이터별 주기에 맞춰<br>스크립트 자동 실행</p></div>
-    <div style="grid-row:1/3; grid-column:2">
-      <svg width="80" height="324"><path d="M0 162 H24 M24 75 V249 M24 75 H66 M24 249 H66" stroke="#0E4A2B" stroke-width="3" fill="none"/><polygon points="64,69 80,75 64,81" fill="#0E4A2B"/><polygon points="64,243 80,249 64,255" fill="#0E4A2B"/></svg>
-    </div>
-    <div class="box" style="grid-row:1; grid-column:3"><h3>주 2회</h3><div class="tech">Ranking · Matches · Statistics</div><p>자주 바뀌는 기록</p></div>
-    <div class="box" style="grid-row:2; grid-column:3"><h3>월 1회</h3><div class="tech">Profile · Biography · Image</div><p>거의 바뀌지 않는 정보</p></div>
-    <div style="grid-row:1/3; grid-column:4">
-      <svg width="80" height="324"><path d="M0 75 H56 M0 249 H56 M56 75 V249 M56 162 H66" stroke="#0E4A2B" stroke-width="3" fill="none"/><polygon points="64,156 80,162 64,168" fill="#0E4A2B"/></svg>
-    </div>
-    <div class="box" style="grid-row:1/3; grid-column:5; align-self:center; height:150px"><h3>선수별 처리</h3><div class="tech">DB 선수 목록 기준</div><p>수집 → Raw 저장 → 정제 저장<br>Bio 변경 시 Gemini 번역</p></div>
   </div>
 </section>
 

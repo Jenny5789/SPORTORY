@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $outDir = Join-Path (Split-Path -Parent $here) 'images'
 $edge = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
-$sections = 'architecture', 'system-flow', 'collect-process', 'pipeline', 'bio-translate', 'schedule', 'trial-automation', 'trial-api', 'screens'
+$sections = 'system-flow', 'collect-process', 'pipeline', 'erd', 'bio-translate', 'trial-automation', 'trial-api', 'screens'
 if ($Only) { $sections = $Only }
 
 $src = ([System.Uri](Join-Path $here 'diagrams.html')).AbsoluteUri
