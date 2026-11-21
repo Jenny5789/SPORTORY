@@ -2,11 +2,7 @@
 
 # SPORTORY
 
-**크롤링 기반 풀스택 웹 서비스**
-
-테니스 선수 기록과 Biography 제공
-
-**[서비스 바로가기](https://sportory.vercel.app/tennis/players)**
+테니스 선수 기록과 Biography를 제공하는 **크롤링 기반 풀스택 웹 서비스**
 
 `Python` · `Selenium + CDP` · `PostgreSQL (Supabase)` · `Gemini 3.1 Flash-Lite` · `FastAPI` · `React 19` · `Vite 8`
 
