@@ -1,112 +1,109 @@
-# SPORTORY &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<sup><sub>2026.09</sub></sup>
+<div align="center">
 
-Selenium · CDP로 ATP 선수 데이터를 수집해 DB · API · 웹 화면 · 배포 · 자동화까지 1인으로 구축한 풀스택 데이터 서비스.
+# SPORTORY
 
-**[🔗 서비스 바로가기](https://sportory.vercel.app/tennis/players)** · [설계 의도](#설계-의도) · [진행 과정](#진행-과정) · [문제 해결](#문제-해결)
+**크롤링 기반 풀스택 웹 서비스** — 테니스 선수의 기록과 이야기를 함께 제공
 
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Selenium](https://img.shields.io/badge/Selenium-43B02A?style=for-the-badge&logo=selenium&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![Gemini](https://img.shields.io/badge/Gemini_API-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)
+**[서비스 바로가기](https://sportory.vercel.app/tennis/players)**
 
-<img src="docs/images/player_cards.jpg" width="480" alt="수집한 ATP 선수 카드 목록">
+`Python` · `Selenium + CDP` · `PostgreSQL (Supabase)` · `Gemini 3.1 Flash-Lite` · `FastAPI` · `React 19` · `Vite 8`
 
-## 개요
+<br />
 
-- **문제**
-  - 경기 일정 · 순위: 여러 사이트에서 쉽게 확인 가능
-  - 선수 Biography: 분산되어 한눈에 모아보기 어려움
-- **해결**
-  - 스크래핑으로 필요한 정보를 수집해 한 곳에서 제공하는 웹 서비스 구현
-  - 브라우저가 받는 JSON 응답 수집 → 원본 DB 저장 → 정제
-  - Biography: 원문 변경 시에만 한국어 번역
-- **결과**
-  - 경기 일정 · 순위 · Biography를 한 곳에서 조회
-  - 선수 목록 요청 N+1회 → 1회로 단축
-  - 선수 20명 데이터 운영 중
+<img src="docs/images/player_cards.jpg" alt="SPORTORY 선수 카드 목록" width="88%" />
 
-## 한눈에 보기
+</div>
 
-| 항목 | 내용 |
-|---|---|
-| 역할 | 1인 · 기획, 데이터 수집, DB 설계, 백엔드, 프론트엔드, 배포, 자동화 |
-| 기간 | 2026.09 – 2026.10 (3주) |
-| 규모 | 선수 20명 · DB 테이블 8개 · REST API 6개 |
-| 배포 | DB Supabase · API Render · 웹 Vercel |
+---
 
-### 핵심 역량
+## 1. 프로젝트 개요
 
-1. **데이터 소스 분석**: 개발자 도구로 화면 데이터의 출처(API 응답 · HTML)를 파악해 수집 방식 설계
-2. **브라우저 기반 수집**: Selenium + CDP Network 로그로 API 응답(JSON) 수집, 봇 차단(403) 대응
-3. **ELT 파이프라인**: Raw 적재 → 정제 · 정규화 → UPSERT, 원본 기반 재처리 구조
-4. **LLM 연동**: 변경 감지로 호출 최소화, Structured Output(JSON Schema)과 응답 검증
-5. **서빙 · 운영**: REST API 설계(N+1 제거), Supabase · Render · Vercel 배포, 스케줄링 자동화
+- **서비스:** 테니스 선수의 기록과 이야기(Biography)를 한 곳에서 제공하는 선수 정보 서비스
+- **배경:** 경기 일정 · 순위는 여러 사이트에서 확인 가능, 선수 Biography는 분산되어 한눈에 보기 어려움
+- **목표:** ATP 선수 데이터 수집 → 기록 · 이야기 통합 제공, 수집부터 배포 · 자동 수집까지 직접 구축
+- **기간:** 2026.09 – 2026.10 (3주)
+- **역할:** 개인 프로젝트 — 기획 · 데이터 수집 · DB 설계 · 백엔드 · 프론트엔드 · 배포 · 자동화
+- **규모:** 선수 20명 · DB 테이블 8개 · REST API 6개
+- **데이터 출처:** [ATP](https://www.atptour.com) 공식 웹사이트 (세계 남자 프로 테니스 선수 · 대회 정보)
 
-## 아키텍처
+| 영역 | 기술 | 사용 이유 |
+| --- | --- | --- |
+| 데이터 수집 | Python · Selenium · CDP Network 로그 | `requests` 요청 `403` 차단 → 브라우저 기반 수집 |
+| 번역 | Gemini API (3.1 Flash-Lite, `google-genai`) | 영문 Biography 한글 번역, Structured Output |
+| DB · 저장소 | PostgreSQL (Supabase) · Supabase Storage · psycopg | 원본 · 정제 데이터, 선수 이미지 저장 |
+| 백엔드 | FastAPI · Uvicorn · Render | DB 조회 REST API |
+| 프론트엔드 | React 19.3 · Vite 8.3 · React Router 7.18 · Vercel | 선수 목록 · 카드 · 상세 화면 |
+| 자동화 | Windows 작업 스케줄러 | 데이터별 주기 수집 |
 
-<img src="docs/images/architecture.png" width="560" alt="ATP 웹사이트 → 수집 → Raw 저장 → 정제 · 번역 → DB → API → 웹 화면">
+---
 
+## 2. 서비스 구조
 
-## 설계 의도
+<p align="center">
+  <img src="docs/images/architecture.png" alt="서비스 구조: ATP 웹사이트 → 데이터 수집 → 처리 · 번역 → DB 저장 → API 서버 → 웹 화면" width="100%" />
+</p>
 
-5개 핵심 결정을 **문제 → 방법** 순으로 정리
+---
 
-### 1. 수집: 화면 HTML 대신 JSON 응답 수집
+## 3. 시스템 흐름도
 
-- **문제**
-  - `requests` 요청 시 `403 Forbidden` 차단
-  - 화면 HTML 파싱은 레이아웃 변경에 취약
-- **방법**
-  - Selenium 실행 → CDP 네트워크 로그에서 JSON 응답 추출
-  - JSON에 없는 Biography만 HTML 파싱
-- **결과**: 프로필 · 순위 · 경기 · 통계 · 이미지 5종을 JSON으로 수집
+<p align="center">
+  <img src="docs/images/system-flow.png" alt="시스템 흐름도: 데이터 수집 흐름과 서비스 요청 흐름" width="100%" />
+</p>
 
-### 2. 저장: 원본 우선 적재, 정제는 후속 처리
+- **데이터 수집 흐름:** 작업 스케줄러 실행 → 수집 → 원본 저장 → 정제 · 번역 → Supabase 저장
+- **서비스 요청 흐름:** 웹 화면 → FastAPI → DB 조회 (웹 화면의 DB 직접 접근 없음)
 
-- **문제**: 수집 즉시 정제하면 정제 규칙 변경 시 재수집 필요
-- **방법**: `raw_data`에 출처 · URL · 선수 ID · 수집 시각과 함께 원본 적재 후 정제
-- **결과**: 정제 규칙이 바뀌어도 재수집 없이 원본으로 재처리 가능
+---
 
-### 3. 갱신: 데이터별 주기 수집 + UPSERT
+## 4. 실제 구현 화면
 
-- **문제**: 데이터마다 갱신 주기가 다름 (순위 주 단위, 프로필 · Biography 변경 빈도 낮음)
-- **방법**
-  - 순위 · 경기 · 통계: 주 2회 / 프로필 · 이미지 · Biography: 월 1회
-  - 키 기준 UPSERT(있으면 갱신, 없으면 추가) → 재실행해도 결과 동일
-- **결과**: 순위 · 경기 · 통계 주 2회, 프로필 · Biography 월 1회 자동 수집 운영
+<p align="center">
+  <img src="docs/images/screens.png" alt="주요 화면: 홈 · 선수 목록 · 선수 카드 앞면 · 뒷면 · 순위" width="100%" />
+</p>
 
-### 4. 번역: 변경 감지 + 구조화 응답 + 검증
+---
 
-- **문제**: 월 1회 재수집 시 변경 없는 원문도 반복 번역 → API 비용 낭비
-- **방법**
-  - 기존 · 신규 원문 섹션별 비교 → 변경 시에만 Gemini 호출
-  - JSON Schema로 응답 형식 고정
-  - 원문 · 번역 개수 검증, `item_order`로 순서 재매핑
-- **결과**: 변경 없는 선수는 Gemini 호출 생략
+## 5. 핵심 기능
 
-### 5. API: 화면 단위 응답 설계
+| 기능 | 핵심 |
+| --- | --- |
+| [데이터 수집](#5-1-데이터-수집) | 화면 HTML 대신 브라우저가 받는 JSON 응답 수집 |
+| [처리 · 저장](#5-2-처리--저장) | 원본 우선 적재 → 정제 → UPSERT |
+| [Biography 번역](#5-3-biography-번역) | 변경 감지 + 구조화 응답 + 검증 |
+| [자동 수집](#5-4-자동-수집) | 변경 빈도별 수집 주기 분리 |
 
-- **문제**: 목록 조회 후 선수마다 순위를 재요청 (N+1 요청)
-- **방법**: `/players` 응답에 최신 순위 · 점수 포함
-- **결과**: 목록 화면 요청 N+1회 → 1회
+### 5-1. 데이터 수집
 
-## 진행 과정
+- **이유:** `requests` 요청 `403` 차단, 화면 HTML 파싱은 레이아웃 변경에 취약, 화면 데이터 대부분이 API 응답(JSON)에 존재
+- **과정:** 개발자 도구로 데이터 출처 파악, `requests` · Playwright · Selenium 비교 실험
 
-| 단계 | 작업 | 검증 |
-|---|---|---|
-| 1. 데이터 소스 분석 | 개발자 도구로 데이터 출처 파악, `requests` · Playwright · Selenium 비교 실험 | 403 차단 확인, CDP로 JSON 응답 확보 |
-| 2. 파이프라인 구축 | Raw 적재 → 정제 → UPSERT, 수집기 일반화 | 선수 ID만 바꿔 동일 수집기로 다수 선수 수집 |
-| 3. API 개발 | FastAPI REST API 6개 | 화면별 필요 응답 구조 정의 |
-| 4. 프론트엔드 | React 선수 목록 · 카드 · 상세 화면 | API 연동, 카드 앞뒤 · Biography Story |
-| 5. 배포 | Supabase · Render · Vercel, CORS 설정 | 배포 환경 화면 · API 연결 |
-| 6. 자동화 | Windows 작업 스케줄러 | 주 2회 · 월 1회 자동 수집 |
-| 7. 개선 | N+1 요청 제거, SPA 라우팅 설정 | 목록 화면 요청 1회로 감소 |
+<p align="center">
+  <img src="docs/images/collect-process.png" alt="데이터 수집 과정: requests 403 → Selenium 브라우저 실행 → CDP 데이터 위치 확인 → 위치별 수집" width="100%" />
+</p>
 
-## 핵심 코드
+- **결과:** 프로필 · 순위 · 경기 · 통계 · 이미지 5종 JSON 응답 수집, JSON에 없는 Biography만 HTML 파싱
 
-### CDP Network 로그에서 API 응답 추출
+<details>
+<summary>데이터별 확인 경로</summary>
+
+<br />
+
+| 데이터 | 확인 경로 | 형태 |
+| --- | --- | --- |
+| Profile | `/players/hero/{player_id}` | JSON |
+| Ranking | `/rank/history/{player_id}` | JSON |
+| Matches | `/activity/sgl/{player_id}/` | JSON |
+| Statistics | `/stats/{player_id}/all/all` | JSON |
+| Image | `player-gladiator-headshot/{player_id}` | PNG |
+| Biography | `.atp_player-bio .tabs` | HTML |
+
+</details>
+
+<details>
+<summary>핵심 코드 — CDP Network 로그에서 API 응답 추출</summary>
+
+<br />
 
 [collect_player_stats.py](crawler/collect_player_stats.py)
 
@@ -136,7 +133,36 @@ for log in performance_logs:
 # (base64 디코딩, 예외 처리, 로그 출력 생략)
 ```
 
-### LLM Structured Output과 응답 검증
+</details>
+
+### 5-2. 처리 · 저장
+
+- **이유:** 수집 즉시 정제하면 정제 규칙 변경 시 재수집 필요, 주기적 재수집 시 중복 저장 방지 필요
+
+<p align="center">
+  <img src="docs/images/pipeline.png" alt="처리 과정: raw_data 원본 저장 → 정제 · 구조화 → UPSERT → 서비스 테이블, 정제 로직 변경 시 원본 기준 재처리" width="100%" />
+</p>
+
+- **결과:** 정제 규칙이 바뀌어도 재수집 없이 원본으로 재처리, 키 기준 UPSERT로 재실행해도 결과 동일
+
+### 5-3. Biography 번역
+
+- **이유:** ATP Biography 영문만 제공 → 한글 번역 필요, 월 1회 재수집 시 변경 없는 원문 반복 번역 → API 비용 낭비
+
+<p align="center">
+  <img src="docs/images/bio-translate.png" alt="번역 과정: 새 Bio 수집 → 기존 Bio와 비교 → 같으면 번역 생략 / 변경되면 Gemini 번역 → 검증 · 저장" width="100%" />
+</p>
+
+- **결과:** 영문 · 한글 Biography 제공, 변경 없는 선수는 Gemini 호출 생략
+
+| 영어 (수집 원문) | 한국어 (Gemini 번역) |
+| --- | --- |
+| <img src="docs/images/bio_en.png" width="100%" alt="Biography 영어 원문"> | <img src="docs/images/bio_ko.png" width="100%" alt="Biography 한국어 번역"> |
+
+<details>
+<summary>핵심 코드 — LLM Structured Output과 응답 검증</summary>
+
+<br />
 
 [translate_player_bio.py](crawler/translate_player_bio.py) · [check_bio_changed.py](crawler/check_bio_changed.py)
 
@@ -172,78 +198,75 @@ translated_by_order = {                                      # item_order 기준
 }
 ```
 
-## 문제 해결
+</details>
 
-### 1. 수집: ATP 요청 `403 Forbidden`
+### 5-4. 자동 수집
 
-- **현상**: `requests`로 페이지 요청 시 403 응답
-- **원인 분석**: 응답 상태 코드 · 본문 출력으로 비브라우저 요청 차단 확인 ([test_atp_request.py](crawler/test_atp_request.py))
-- **해결**: Selenium 브라우저 실행 + CDP Network 로그 기반 응답 수집으로 전환
-- **결과**: 프로필 · 순위 · 경기 · 통계 · 이미지 5종 JSON 수집
+- **이유:** 데이터별 변경 빈도 차이 — 순위 · 경기 · 통계는 잦은 변경, 프로필 · Biography · 이미지는 변경 드묾
 
-### 2. 번역: 변경 없는 Biography 반복 번역
+<p align="center">
+  <img src="docs/images/schedule.png" alt="자동 수집: Windows 작업 스케줄러 → 주 2회 / 월 1회 → 선수별 처리" width="100%" />
+</p>
 
-- **현상**: 월 1회 재수집마다 동일 원문 재번역
-- **원인 분석**: 변경 여부와 무관하게 번역 단계 실행
-- **해결**: 기존 원문과 섹션별 비교 후 변경 시에만 번역
-- **결과**: 변경 없는 선수는 Gemini 호출 생략
+- **결과:** 순위 · 경기 · 통계 주 2회, 프로필 · Biography · 이미지 월 1회 자동 수집 운영
 
-### 3. 자동화: GitHub Actions에서 통계 응답 수집 실패
+---
 
-- **현상**: 로컬에서는 수집되던 통계 응답이 Actions 환경에서 미수집
-- **원인 분석**: 응답 URL 로그 추가, Chrome 실행 옵션 조정으로 원인 범위 축소 시도
-- **해결**: Windows 작업 스케줄러로 전환. 상시 실행이 필요한 Python `schedule` 방식도 제외
-- **결과**: 주 2회 · 월 1회 자동 수집 운영
+## 6. 문제 해결 경험
 
-### 4. API: 선수 목록 화면 N+1 요청
+### 1) 수집: ATP 요청 `403 Forbidden`
 
-- **현상**: 목록 조회 후 선수마다 `/rankings?limit=1` 추가 요청
-- **원인 분석**: 목록 API가 화면에 필요한 최신 순위를 미포함
-- **해결**: `/players` 응답에 최신 순위 · 점수 포함 ([커밋](https://github.com/Jenny5789/SPORTORY/commit/2566428))
-- **결과**: 목록 화면 요청 N+1회 → 1회, 프론트엔드 요청 로직 단순화
+- **문제:** `requests`로 페이지 요청 시 `403` 응답
+- **원인 분석:** 응답 상태 코드 · 본문 출력으로 비브라우저 요청 차단 확인 ([test_atp_request.py](crawler/test_atp_request.py))
+- **해결:** Selenium 브라우저 실행 + CDP Network 로그 기반 응답 수집으로 전환
+- **결과:** 프로필 · 순위 · 경기 · 통계 · 이미지 5종 JSON 수집
 
-## 결과 화면
+### 2) 자동화: GitHub Actions에서 통계 응답 수집 실패
 
-| 선수 카드 (앞면) | 순위 이력 |
-|---|---|
-| <img src="docs/images/profile.png" width="280" alt="선수 카드"> | <img src="docs/images/ranking.png" width="280" alt="순위 이력"> |
+- **문제:** 로컬에서는 수집되던 통계 응답이 Actions 환경에서 미수집
+- **원인 분석:** 응답 URL 로그 추가, Chrome 실행 옵션 조정으로 원인 범위 축소 시도
+- **해결:** Windows 작업 스케줄러로 전환, 상시 실행이 필요한 Python `schedule` 방식도 제외
+- **결과:** 주 2회 · 월 1회 자동 수집 운영
 
-**Biography (원문 수집 → LLM 번역)**
+<p align="center">
+  <img src="docs/images/trial-automation.png" alt="자동 수집 방식 전환: GitHub Actions 실패 → Python schedule 한계 → Windows 작업 스케줄러 최종 적용" width="100%" />
+</p>
 
-| 영어 (수집 원문) | 한국어 (Gemini 번역) |
-|---|---|
-| <img src="docs/images/bio_en.png" width="320" alt="Biography 영어 원문"> | <img src="docs/images/bio_ko.png" width="320" alt="Biography 한국어 번역"> |
+### 3) 번역: 변경 없는 Biography 반복 번역
 
-## 한계와 개선 방향
+- **문제:** 월 1회 재수집마다 동일 원문 재번역
+- **원인 분석:** 변경 여부와 무관하게 번역 단계 실행
+- **해결:** 기존 원문과 섹션별 비교 후 변경 시에만 번역
+- **결과:** 변경 없는 선수는 Gemini 호출 생략
 
-- **로컬 스케줄러 의존**: PC 종료 시 수집 중단 → 클라우드 스케줄링 필요
-- **수집 대상 확장**: 선수 추가 절차는 [ADD_PLAYER_GUIDE.md](docs/ADD_PLAYER_GUIDE.md)로 정리, 대상 확대 시 수집 시간 증가 대응 필요
-- **테스트 부재**: 정제 · 매핑 함수 단위 테스트로 외부 스키마 변경 조기 감지 필요
+### 4) API: 선수 목록 화면 N+1 요청
 
-## 기술 스택
+- **문제:** 목록 조회 후 선수마다 `/rankings?limit=1` 추가 요청
+- **원인 분석:** 목록 API가 화면에 필요한 최신 순위 미포함
+- **해결:** `/players` 응답에 최신 순위 · 점수 포함 ([커밋](https://github.com/Jenny5789/SPORTORY/commit/2566428))
+- **결과:** 목록 화면 요청 N+1회 → 1회, 프론트엔드 요청 로직 단순화
 
-| 영역 | 기술 |
-|---|---|
-| 언어 | Python, JavaScript(JSX), HTML, CSS |
-| 수집 | Selenium, Chrome DevTools Protocol(CDP) Network 로그 |
-| 번역 | Google Gemini API (`google-genai`, Structured Output) |
-| DB · 스토리지 | PostgreSQL, Supabase(Storage 포함), psycopg |
-| 백엔드 | FastAPI, Uvicorn |
-| 프론트엔드 | React 19, Vite 8, React Router 7, CSS(컴포넌트별 파일) |
-| 자동화 | Windows 작업 스케줄러 |
-| 배포 | Supabase · Render(API) · Vercel(웹) |
+<p align="center">
+  <img src="docs/images/trial-api.png" alt="API 요청 구조 개선: Before 선수별 rankings 반복 호출 → After /players 1회 호출" width="100%" />
+</p>
 
-## 배운 점
+---
 
-- 수집 방식을 바꾸기 전에 응답을 직접 확인해 원인부터 특정하는 접근
-- 원본 저장과 정제를 분리해 재처리 가능한 구조를 먼저 설계하는 것의 가치
-- AI 번역 결과는 응답 형식 고정과 검증을 거쳐야 서비스 데이터로 쓸 수 있다는 점
+## 7. 한계와 개선 방향
+
+- **로컬 스케줄러 의존:** PC 종료 시 수집 중단 → 클라우드 스케줄링 필요
+- **수집 대상 확장:** 선수 추가 절차는 [ADD_PLAYER_GUIDE.md](docs/ADD_PLAYER_GUIDE.md)로 정리, 대상 확대 시 수집 시간 증가 대응 필요
+- **테스트 부재:** 정제 · 매핑 함수 단위 테스트로 외부 스키마 변경 조기 감지 필요
+
+---
 
 <details>
 <summary><b>API · DB 테이블</b></summary>
 
+<br />
+
 | Method | Endpoint | 설명 |
-|---|---|---|
+| --- | --- | --- |
 | GET | `/players` | 선수 목록 + 최신 순위 · 점수 |
 | GET | `/players/{player_id}` | 선수 상세 정보 · 이미지 URL |
 | GET | `/players/{player_id}/bio` | Biography (영문 · 한글) |
@@ -252,7 +275,7 @@ translated_by_order = {                                      # item_order 기준
 | GET | `/players/{player_id}/matches` | 경기 · 대회 정보 |
 
 | 테이블 | 역할 |
-|---|---|
+| --- | --- |
 | `raw_data` | 수집 원본 · 수집 정보 |
 | `players` | 선수 기본 정보 |
 | `player_images` | 선수 이미지 경로 |
@@ -265,6 +288,8 @@ translated_by_order = {                                      # item_order 기준
 
 <details>
 <summary><b>실행 방법 · 폴더 구조</b></summary>
+
+<br />
 
 **환경 변수** (`.env`, 저장소 미포함)
 
@@ -305,8 +330,37 @@ SPORTORY/
 │   └── experiments/    # 수집 방식 검증용 테스트 코드
 ├── backend/            # FastAPI (main.py · routers/)
 ├── frontend/           # React · Vite
-├── docs/               # 자동화 · 선수 추가 가이드, 화면 캡처
+├── docs/               # README 이미지 · 도식 원본(diagrams/) · 가이드
 └── requirements.txt
 ```
 
 </details>
+
+---
+
+## 8. 프로젝트를 통해 얻은 경험
+
+> **데이터 수집부터 DB · API · 웹 화면 · 배포 · 자동 수집까지 서비스 전체 1인 설계 · 구현**
+
+| 역량 | 경험 |
+| --- | --- |
+| **데이터 소스 분석** | 개발자 도구로 화면 데이터 출처(API 응답 · HTML) 파악 → 수집 방식 설계 |
+| **브라우저 기반 수집** | Selenium + CDP Network 로그로 JSON 응답 수집, 봇 차단(`403`) 대응 |
+| **ELT 파이프라인** | Raw 적재 → 정제 · 정규화 → UPSERT, 원본 기반 재처리 구조 |
+| **LLM 연동** | Structured Output(JSON Schema) · 응답 검증, 변경 감지로 호출 최소화 |
+| **REST API 설계** | 화면 단위 응답 설계로 N+1 요청 제거 |
+| **배포 · 운영** | Supabase · Render · Vercel 배포, Windows 작업 스케줄러 자동 수집 |
+
+**배운 점**
+
+- 수집 방식을 바꾸기 전에 응답을 직접 확인해 원인부터 특정하는 접근
+- 원본 저장과 정제를 분리해 재처리 가능한 구조를 먼저 설계하는 것의 가치
+- AI 번역 결과는 응답 형식 고정과 검증을 거쳐야 서비스 데이터로 쓸 수 있다는 점
+
+<br />
+
+<div align="center">
+
+**[SPORTORY 서비스 바로가기](https://sportory.vercel.app/tennis/players)**
+
+</div>
