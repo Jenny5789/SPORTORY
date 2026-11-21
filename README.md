@@ -2,7 +2,7 @@
 
 # SPORTORY
 
-테니스 선수 기록과 Biography를 제공하는 **크롤링 기반 풀스택 웹 서비스**
+크롤링·Flask·MySQL·REST API로 구현한 **풀스택 웹 서비스**
 
 `Python` · `Selenium + CDP` · `PostgreSQL (Supabase)` · `Gemini 3.1 Flash-Lite` · `FastAPI` · `React 19` · `Vite 8`
 
