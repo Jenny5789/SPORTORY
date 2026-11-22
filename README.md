@@ -23,7 +23,7 @@
 - **규모:** 선수 20명, DB 테이블 8개, REST API 6개
 - **데이터 출처:** ATP 공식 웹사이트 (남자 프로 테니스 투어)
 
-| 영역 | 기술 | 사용 이유 |
+| 영역 | 기술 | 용도 |
 | --- | --- | --- |
 | 데이터 수집 | Python, Selenium, CDP Network 로그 | `requests` `403` 차단으로 브라우저 수집 |
 | 번역 | Gemini API (3.1 Flash-Lite, `google-genai`) | Biography 영한 번역, Structured Output |
@@ -196,7 +196,7 @@ translated_by_order = {                                      # item_order 기준
 
 ---
 
-## 5. 문제 해결 경험
+## 5. 문제 해결
 
 ### 1) 수집: ATP 요청 `403 Forbidden`
 
