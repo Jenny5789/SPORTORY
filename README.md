@@ -225,10 +225,10 @@ translated_by_order = {                                      # item_order 기준
 
 ### 4) API: 선수 목록 화면 N+1 요청
 
-- **문제:** 목록 조회 후 선수마다 `/rankings?limit=1` 추가 요청
-- **원인 분석:** 목록 API에 최신 순위 미포함
+- **문제:** 목록 조회 1회 후 선수마다 `/rankings?limit=1` 추가 요청, 선수 수를 N이라 하면 요청 1 + N회 (선수 20명이면 21회)
+- **원인 분석:** 목록 API(`/players`) 응답에 최신 순위가 없어 화면이 선수별로 따로 조회
 - **해결:** `/players` 응답에 최신 순위와 점수 추가 ([커밋](https://github.com/Jenny5789/SPORTORY/commit/2566428))
-- **결과:** 요청 N+1회 → 1회, 프론트엔드 선수별 요청 코드 삭제
+- **결과:** 요청 1 + N회 → 1회 (선수 20명 기준 21회 → 1회), 프론트엔드 선수별 요청 코드 삭제
 
 <p align="center">
   <img src="docs/images/trial-api.png" alt="API 요청 개선: Before 선수별 rankings 반복 호출, After /players 1회 호출" width="100%" />
